@@ -1,19 +1,47 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TextInput, Alert, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
+import { doc, setDoc, Timestamp } from 'firebase/firestore';
+import { auth, db } from '../../firebaseConfig';
 import { router } from 'expo-router';
+import { sendEmailVerification } from 'firebase/auth';
 
 export default function Register() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [age, setAge] = useState('');
   const [password, setPassword] = useState('');
 
   const handleRegister = async () => {
+    if (!name || !email || !phone || !age || !password) {
+      Alert.alert('Error', 'All fields are required.');
+      return;
+    }
+
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      router.replace('/(tabs)'); // redirect to home
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid;
+
+      await setDoc(doc(db, 'users', userId), {
+        name,
+        email,
+        phone,
+        age: Number(age),
+        createdAt: Timestamp.now(),
+      });
+      
+      // ✅ Send verification email
+      await sendEmailVerification(userCredential.user);
+      router.replace({
+        pathname: '/verify',
+        params: { fromRegister: '1' }
+      });
+      
+      
+      router.replace('/verify');
     } catch (error: any) {
-      alert(error.message);
+      Alert.alert('Registration Failed', error.message);
     }
   };
 
@@ -22,24 +50,11 @@ export default function Register() {
       <Text style={styles.logo}>Bidify</Text>
       <Text style={styles.title}>Create your account</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email address"
-        placeholderTextColor="#888"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        placeholderTextColor="#888"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-      />
+      <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor="#888" value={name} onChangeText={setName} />
+      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
+      <TextInput style={styles.input} placeholder="Phone" placeholderTextColor="#888" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
+      <TextInput style={styles.input} placeholder="Age" placeholderTextColor="#888" value={age} onChangeText={setAge} keyboardType="numeric" />
+      <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" value={password} onChangeText={setPassword} secureTextEntry />
 
       <Pressable style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Register</Text>
@@ -55,7 +70,7 @@ export default function Register() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0e0e10', // dark theme
+    backgroundColor: '#0e0e10',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,

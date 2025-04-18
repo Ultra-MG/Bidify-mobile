@@ -11,7 +11,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      router.replace('/(tabs)');
+      router.replace('/screens/Home');
     } catch (error: any) {
       alert(error.message);
     }
@@ -48,6 +48,10 @@ export default function Login() {
       <TouchableOpacity onPress={() => router.push('/screens/Register')}>
         <Text style={styles.link}>Don’t have an account? <Text style={styles.linkUnderline}>Register</Text></Text>
       </TouchableOpacity>
+      <TouchableOpacity onPress={() => router.push('/admin')}>
+  <Text style={{ color: 'blue' }}>Open Admin</Text>
+</TouchableOpacity>
+
     </View>
   );
 }
@@ -102,3 +106,4 @@ const styles = StyleSheet.create({
     textDecorationLine: 'underline',
   },
 });
+
