@@ -10,7 +10,7 @@ export default function HomeScreen() {
       <Text style={styles.logo}>Bidify</Text>
       <Text style={styles.title}>You're logged in 🎉</Text>
 
-      <Pressable style={styles.button} onPress={() => router.push('/(tabs)/profile')}>
+      <Pressable style={styles.button} onPress={() => router.push('/profile')}>
         <Text style={styles.buttonText}>Go to Profile</Text>
       </Pressable>
 
@@ -21,6 +21,10 @@ export default function HomeScreen() {
       <Pressable style={styles.signOutButton} onPress={() => signOut(auth)}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </Pressable>
+      <Pressable style={styles.button} onPress={() => router.push('/ProductListScreen')}>
+  <Text style={styles.buttonText}>🛍 View Products</Text>
+</Pressable>
+
     </View>
   );
 }

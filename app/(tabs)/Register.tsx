@@ -60,7 +60,7 @@ export default function Register() {
         <Text style={styles.buttonText}>Register</Text>
       </Pressable>
 
-      <TouchableOpacity onPress={() => router.push('/screens/login')}>
+      <TouchableOpacity onPress={() => router.push('/login')}>
         <Text style={styles.link}>Already have an account? <Text style={styles.linkUnderline}>Login</Text></Text>
       </TouchableOpacity>
     </View>
