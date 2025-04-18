@@ -1,5 +1,6 @@
 import { View, Button, Text } from 'react-native';
 import { runSeeder } from '../scripts/seedFirestore';
+import { seedProducts } from '../scripts/seedFirestore';
 
 export default function AdminSeeder() {
   return (
@@ -12,8 +13,18 @@ export default function AdminSeeder() {
     runSeeder().then(() => console.log('✅ Seeder function resolved'));
   }}
 />
+<Text style={{ fontSize: 20, marginBottom: 20 }}>Seed Products</Text>
+      <Button
+        title="Seed Demo Products"
+        onPress={() => {
+          console.log('Seeder pressed');
+          seedProducts().then(() => console.log('✅ Done seeding.'));
+        }}
+      />
     </View>
+    
   );
+
 }
 
 // import { View, Text, Button } from 'react-native';

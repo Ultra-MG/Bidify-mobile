@@ -21,7 +21,7 @@ export default function HomeScreen() {
       <Pressable style={styles.signOutButton} onPress={() => signOut(auth)}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </Pressable>
-      <Pressable style={styles.button} onPress={() => router.push('/ProductListScreen')}>
+      <Pressable style={styles.button} onPress={() => router.push('/products')}>
   <Text style={styles.buttonText}>🛍 View Products</Text>
 </Pressable>
 

@@ -27,7 +27,7 @@ export default function VerifyScreen() {
           setVerified(true);
           setShowMessage(true);
           setTimeout(() => {
-            router.replace('/(tabs)/Home');
+            router.replace('/(tabs)');
           }, 2000);
           clearInterval(interval);
         }

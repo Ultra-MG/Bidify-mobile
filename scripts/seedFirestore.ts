@@ -10,6 +10,8 @@ export const seedStatuses = async () => {
   }
 };
 
+
+
 // Seed product_cat1 (main categories)
 export const seedCat1 = async () => {
   const categories = ['electronics', 'fashion', 'books'];
@@ -30,19 +32,75 @@ export const seedCat2 = async () => {
   }
 };
 
-// Optional: Seed 1 demo product
-export const seedProduct = async () => {
-  await setDoc(doc(db, 'products', 'demo1'), {
-    title: 'iPhone 15 Pro',
-    description: '256GB, Graphite',
-    price: 999,
-    statusId: 'available',
-    cat1Id: 'electronics',
-    cat2Id: 'smartphones',
-    ownerId: 'admin123',
-    createdAt: new Date(),
-  });
+
+
+// Optional: Replace these with your real image URLs
+const demoImages1 = [
+  'https://i.ebayimg.com/images/g/HfwAAOSwVjZj99~Z/s-l1600.jpg',
+  'https://tse2.mm.bing.net/th/id/OIP.g5jnjWmBlBKAztYjuDYHIQHaNK?rs=1&pid=ImgDetMain',
+  'https://tse3.mm.bing.net/th/id/OIP.m75VkXKdxBA0rrBhTIAojgHaHa?rs=1&pid=ImgDetMain',
+];
+const demoImages2 = [
+    'https://tse2.mm.bing.net/th/id/OIP.g5jnjWmBlBKAztYjuDYHIQHaNK?rs=1&pid=ImgDetMain',
+    'https://i.ebayimg.com/images/g/HfwAAOSwVjZj99~Z/s-l1600.jpg',
+    'https://tse3.mm.bing.net/th/id/OIP.m75VkXKdxBA0rrBhTIAojgHaHa?rs=1&pid=ImgDetMain',
+];
+const demoImages3 = [
+  'https://tse3.mm.bing.net/th/id/OIP.m75VkXKdxBA0rrBhTIAojgHaHa?rs=1&pid=ImgDetMain',
+  'https://i.ebayimg.com/images/g/HfwAAOSwVjZj99~Z/s-l1600.jpg',
+  'https://tse2.mm.bing.net/th/id/OIP.g5jnjWmBlBKAztYjuDYHIQHaNK?rs=1&pid=ImgDetMain',
+];
+
+export const seedProducts = async () => {
+  const demoProducts = [
+    {
+      id: 'iphone15',
+      title: 'iPhone 15 Pro Max',
+      description: '256GB, Titanium Blue, A17 Pro chip',
+      price: 1399,
+      cat1Id: 'electronics',
+      cat2Id: 'smartphones',
+      statusId: 'available',
+      ownerId: 'admin123',
+      createdAt: new Date(),
+      photos: demoImages1,
+      mainPhotoIndex: 0,
+    },
+    {
+      id: 'ps5',
+      title: 'PlayStation 5 Console',
+      description: 'Disk version, includes controller',
+      price: 549,
+      cat1Id: 'electronics',
+      cat2Id: 'gaming',
+      statusId: 'available',
+      ownerId: 'admin123',
+      createdAt: new Date(),
+      photos: demoImages2,
+      mainPhotoIndex: 1,
+    },
+    {
+      id: 'airmax',
+      title: 'Nike Air Max 270',
+      description: 'Red / Black, Size 42',
+      price: 129,
+      cat1Id: 'fashion',
+      cat2Id: 'shoes',
+      statusId: 'available',
+      ownerId: 'admin123',
+      createdAt: new Date(),
+      photos: demoImages3,
+      mainPhotoIndex: 2,
+    },
+  ];
+
+  for (const product of demoProducts) {
+    await setDoc(doc(db, 'products', product.id), product);
+  }
+
+  console.log('✅ Sample products seeded.');
 };
+
 
 // Main seeder
 export const runSeeder = async () => {
@@ -51,7 +109,7 @@ console.log('✅ Running Seeder...');
   await seedStatuses();
   await seedCat1();
   await seedCat2();
-  await seedProduct(); // optional
+  await seedProducts(); // optional
   console.log('✅ Firestore seeded');
 } catch (error) {
     console.error('❌ Seeder failed:', error);
