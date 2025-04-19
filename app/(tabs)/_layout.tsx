@@ -3,7 +3,9 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function TabLayout() {
   return (
+    
     <Tabs
+      initialRouteName="home"
       screenOptions={{
         headerShown: false,
         tabBarActiveTintColor: '#10a37f',
@@ -21,11 +23,12 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen
-        name="index"
+        name="home"
         options={{
           title: 'Home',
           tabBarIcon: ({ color, size }) => <Ionicons name="home-outline" color={color} size={size} />,
         }}
+        
       />
       <Tabs.Screen
         name="orders"

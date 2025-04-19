@@ -1,27 +1,17 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
 import { Stack, router } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
-import 'react-native-reanimated';
-import { auth } from '../firebaseConfig';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { ActivityIndicator, View } from 'react-native';
 import { useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-
-SplashScreen.preventAutoHideAsync();
-
-
+import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebaseConfig';
+import { View, ActivityIndicator } from 'react-native';
 
 export default function RootLayout() {
-  const [user, setUser] = useState<User | null | undefined>(undefined);
+  const [user, setUser] = useState<null | object | undefined>(undefined);
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       setUser(firebaseUser);
     });
-    return unsub;
+    return unsubscribe;
   }, []);
 
   if (user === undefined) {
@@ -34,8 +24,7 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name={user ? '(tabs)' : 'auth'} />
-      <Stack.Screen name="+not-found" />
+      <Stack.Screen name={user ? '/home' : 'authentication/login'} />
     </Stack>
   );
 }

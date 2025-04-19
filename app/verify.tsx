@@ -27,7 +27,9 @@ export default function VerifyScreen() {
           setVerified(true);
           setShowMessage(true);
           setTimeout(() => {
-            router.replace('/(tabs)');
+            if (auth.currentUser) {
+              router.replace('/home');
+            }            
           }, 2000);
           clearInterval(interval);
         }

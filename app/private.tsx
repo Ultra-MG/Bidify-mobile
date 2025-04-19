@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { signOut } from 'firebase/auth';
-import { auth } from '../../firebaseConfig';
+import { auth } from '../firebaseConfig';
 import { router } from 'expo-router';
 
 export default function HomeScreen() {
@@ -21,7 +21,7 @@ export default function HomeScreen() {
       <Pressable style={styles.signOutButton} onPress={() => signOut(auth)}>
         <Text style={styles.buttonText}>Sign Out</Text>
       </Pressable>
-      <Pressable style={styles.button} onPress={() => router.push('/products')}>
+      <Pressable style={styles.button} onPress={() => router.push('../product/products')}>
   <Text style={styles.buttonText}>🛍 View Products</Text>
 </Pressable>
 

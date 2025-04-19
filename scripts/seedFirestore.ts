@@ -54,7 +54,7 @@ const demoImages3 = [
 export const seedProducts = async () => {
   const demoProducts = [
     {
-      id: 'iphone15',
+      id: 'iphone10',
       title: 'iPhone 15 Pro Max',
       description: '256GB, Titanium Blue, A17 Pro chip',
       price: 1399,
@@ -67,7 +67,7 @@ export const seedProducts = async () => {
       mainPhotoIndex: 0,
     },
     {
-      id: 'ps5',
+      id: 'xbox',
       title: 'PlayStation 5 Console',
       description: 'Disk version, includes controller',
       price: 549,
@@ -80,7 +80,7 @@ export const seedProducts = async () => {
       mainPhotoIndex: 1,
     },
     {
-      id: 'airmax',
+      id: 'nikrmx',
       title: 'Nike Air Max 270',
       description: 'Red / Black, Size 42',
       price: 129,

@@ -1,57 +1,80 @@
 import { useEffect, useState } from 'react';
-import { View, Text, FlatList, Image, Pressable, StyleSheet, ActivityIndicator, TextInput } from 'react-native';
-import { collection, getDocs } from 'firebase/firestore';
+import ProductHorizontalCard from '../product/ProductHorizontalCard'; 
+import {
+  View,
+  Text,
+  FlatList,
+  Image,
+  Pressable,
+  StyleSheet,
+  ActivityIndicator,
+  TextInput,
+} from 'react-native';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { db } from '../../firebaseConfig';
-import { useRouter } from 'expo-router';
+import {
+  collection,
+  getDocs,
+  query,
+  where,
+  DocumentData,
+} from 'firebase/firestore';
 
 export default function ProductListScreen() {
   const [products, setProducts] = useState<any[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
-  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
+  // safer parsing for query params
+  const rawSearch = useLocalSearchParams().search;
+  const rawCat1Id = useLocalSearchParams().cat1Id;
+  const searchParam = Array.isArray(rawSearch) ? rawSearch[0] : rawSearch || '';
+  const cat1Id = Array.isArray(rawCat1Id) ? rawCat1Id[0] : rawCat1Id || '';
+
+  const [searchInput, setSearchInput] = useState(searchParam);
+
   const fetchProducts = async () => {
-    const snap = await getDocs(collection(db, 'products'));
-    const list = snap.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-    setProducts(list);
-    setFilteredProducts(list);
-    setLoading(false);
+    try {
+      const baseRef = collection(db, 'products');
+      const q = cat1Id ? query(baseRef, where('cat1Id', '==', cat1Id)) : baseRef;
+
+      const snap = await getDocs(q);
+      const list = snap.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setProducts(list);
+      setFilteredProducts(
+        searchParam
+          ? list.filter((p: any) =>
+              p.title?.toLowerCase().includes(searchParam.toLowerCase())
+            )
+          : list
+      );
+    } catch (err) {
+      console.error('Error fetching products:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
     fetchProducts();
   }, []);
 
+  // 🧠 Update route on search input change
   useEffect(() => {
-    const query = search.toLowerCase();
-    setFilteredProducts(
-      products.filter(p =>
-        p.title.toLowerCase().includes(query) || p.description.toLowerCase().includes(query)
-      )
+    const q = searchInput.toLowerCase();
+    const filtered = products.filter(p =>
+      p.title?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
     );
-  }, [search, products]);
+    setFilteredProducts(filtered);
+  }, [searchInput, products]);
+  
 
   const renderItem = ({ item }: { item: any }) => (
-    <Pressable
-      style={styles.card}
-      onPress={() => router.push(`../product/${item.id}`)}
-    >
-<Image
-  source={{
-    uri: item.photos?.[0] || 'https://via.placeholder.com/300',
-  }}
-  style={styles.image}
-/>
-
-      <View style={styles.details}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.price}>${item.price}</Text>
-      </View>
-    </Pressable>
+    <ProductHorizontalCard product={item} />
   );
 
   if (loading) {
@@ -68,8 +91,9 @@ export default function ProductListScreen() {
         style={styles.searchInput}
         placeholder="Search products..."
         placeholderTextColor="#aaa"
-        value={search}
-        onChangeText={setSearch}
+        value={searchInput}
+        onChangeText={setSearchInput}
+        returnKeyType="search"
       />
       <FlatList
         data={filteredProducts}

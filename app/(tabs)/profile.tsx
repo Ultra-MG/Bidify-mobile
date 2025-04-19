@@ -1,24 +1,27 @@
-import { useEffect, useState } from 'react';
-import { View, Text, TextInput, StyleSheet, Image, Pressable, ActivityIndicator, Alert } from 'react-native';
-import { auth, db } from '../../firebaseConfig';
-import { doc, getDoc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { deleteUser, updatePassword } from 'firebase/auth';
+
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { router } from 'expo-router';
+import { useEffect, useState } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Alert,
+  Modal,
+  TouchableOpacity,
+} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { MaterialIcons } from '@expo/vector-icons';
-
-
-
+import { auth, db } from '../../firebaseConfig';
+import { doc, getDoc } from 'firebase/firestore';
 
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
   const [localImage, setLocalImage] = useState<string | null>(null);
-  const [editing, setEditing] = useState(false);
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [age, setAge] = useState('');
-  const [newPassword, setNewPassword] = useState('');
+  const [modalVisible, setModalVisible] = useState(false);
 
   const loadProfile = async () => {
     const uid = auth.currentUser?.uid;
@@ -26,194 +29,116 @@ export default function ProfileScreen() {
 
     const userSnap = await getDoc(doc(db, 'users', uid));
     if (userSnap.exists()) {
-      const data = userSnap.data();
-      setProfile(data);
-      setName(data.name);
-      setPhone(data.phone);
-      setAge(data.age.toString());
+      setProfile(userSnap.data());
     }
 
     const storedUri = await AsyncStorage.getItem('profilePhoto');
     if (storedUri) setLocalImage(storedUri);
-
-    setLoading(false);
-  };
-
-  const saveProfile = async () => {
-    const uid = auth.currentUser?.uid;
-    if (!uid) return;
-
-    try {
-      await updateDoc(doc(db, 'users', uid), {
-        name,
-        phone,
-        age: Number(age),
-      });
-      setProfile({ ...profile, name, phone, age: Number(age) });
-      setEditing(false);
-      Alert.alert('Profile updated');
-    } catch (err) {
-      console.error(err);
-      Alert.alert('Update failed');
-    }
-  };
-
-  const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
-      allowsEditing: true,
-      aspect: [1, 1],
-      quality: 0.6,
-    });
-
-    if (!result.canceled && result.assets?.length) {
-      const uri = result.assets[0].uri;
-      setLocalImage(uri);
-      await AsyncStorage.setItem('profilePhoto', uri);
-    }
-  };
-
-  const removeImage = async () => {
-    await AsyncStorage.removeItem('profilePhoto');
-    setLocalImage(null);
-  };
-
-  const handlePasswordUpdate = async () => {
-    if (!newPassword) return;
-    try {
-        if (!auth.currentUser) {
-            Alert.alert("You must be logged in to update your password.");
-            return;
-          }
-          
-          await updatePassword(auth.currentUser, newPassword);     
-      setNewPassword('');
-    } catch (error: any) {
-      console.error(error);
-      Alert.alert('❌ Failed to update password', error.message);
-    }
-  };
-
-  const handleDeleteAccount = async () => {
-    try {
-      const uid = auth.currentUser?.uid;
-      if (!uid) return;
-
-      if (!auth.currentUser) {
-        Alert.alert("You must be logged in to delete your accounr.");
-        return;
-      }
-      await deleteDoc(doc(db, 'users', uid));
-      await deleteUser(auth.currentUser);
-      Alert.alert('🗑 Account deleted successfully');
-    } catch (error: any) {
-      console.error(error);
-      Alert.alert('❌ Could not delete account', error.message);
-    }
   };
 
   useEffect(() => {
     loadProfile();
   }, []);
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <ActivityIndicator color="#10a37f" size="large" />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
+      {/* Header */}
+      <View style={styles.header}>
+        <Pressable onPress={() => setModalVisible(true)} style={styles.avatarWrapper}>
+          {localImage ? (
+            <Image source={{ uri: localImage }} style={styles.avatar} />
+          ) : (
+            <View style={[styles.avatar, styles.placeholder]}>
+              <Ionicons name="person-circle-outline" size={60} color="#aaa" />
+            </View>
+          )}
+        </Pressable>
 
-      <View style={styles.avatarWrapper}>
-  <Pressable onPress={pickImage}>
-    <Image
-      source={{
-        uri: localImage || 'https://via.placeholder.com/100',
-      }}
-      style={styles.avatar}
-    />
-    <View style={styles.penIcon}>
-      <MaterialIcons name="edit" size={20} color="#fff" />
+        <Text style={styles.name}>{profile?.name || 'Loading...'}</Text>
+      </View>
+
+      {/* Modal for full image */}
+      <Modal visible={modalVisible} transparent={true}>
+        <TouchableOpacity style={styles.modalContainer} onPress={() => setModalVisible(false)}>
+          <Image
+            source={{ uri: localImage || 'https://via.placeholder.com/300' }}
+            style={styles.fullImage}
+            resizeMode="contain"
+          />
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Scrollable Actions */}
+      <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 40 }}>
+      {[
+  { label: 'Edit Profile', icon: 'create-outline', route: '/profile/editprofile' },
+  { label: 'Cart', icon: 'cart-outline', route: '/cart/cart' },
+  { label: 'Settings', icon: 'settings-outline', route: '/settings/settings' },
+  { label: 'Chats', icon: 'chatbubble-outline', route: '/chats' },
+  {
+    label: 'Logout',
+    icon: 'log-out-outline',
+    action: () => {
+      Alert.alert('Confirm Logout', 'Are you sure you want to logout?', [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            await auth.signOut();
+            router.replace('/authentication/login');
+          },
+        },
+      ]);
+    },
+  }
+  
+].map((item, i) => (
+  <Pressable key={i} style={styles.row} onPress={() => {
+    if (item.route) {
+      router.push(item.route as any);
+    } else if (item.action) {
+      item.action();
+    }
+  }}>
+    <View style={styles.rowLeft}>
+      <Ionicons name={item.icon as any} size={20} color="#10a37f" />
+      <Text style={styles.rowText}>{item.label}</Text>
     </View>
+    <Ionicons name="chevron-forward" size={20} color="#888" />
   </Pressable>
-
-  {localImage && (
-    <Pressable onPress={removeImage} style={styles.removeBtn}>
-      <Text style={styles.removeText}>Remove Photo</Text>
-    </Pressable>
-  )}
-</View>
-
-
-
-      <Text style={styles.label}>Email:</Text>
-      <Text style={styles.value}>{profile?.email}</Text>
-
-      <Text style={styles.label}>Name:</Text>
-      <TextInput style={styles.input} value={name} onChangeText={setName} editable={editing} />
-
-      <Text style={styles.label}>Phone:</Text>
-      <TextInput style={styles.input} value={phone} onChangeText={setPhone} editable={editing} />
-
-      <Text style={styles.label}>Age:</Text>
-      <TextInput style={styles.input} value={age} onChangeText={setAge} editable={editing} keyboardType="numeric" />
-
-      <Pressable style={styles.button} onPress={editing ? saveProfile : () => setEditing(true)}>
-        <Text style={styles.buttonText}>{editing ? 'Save Changes' : 'Edit Profile'}</Text>
-      </Pressable>
-
-      <Text style={styles.label}>New Password:</Text>
-      <TextInput style={styles.input} value={newPassword} onChangeText={setNewPassword} secureTextEntry placeholder="Enter new password" placeholderTextColor="#888" />
-
-      <Pressable style={styles.button} onPress={handlePasswordUpdate}>
-        <Text style={styles.buttonText}>Update Password</Text>
-      </Pressable>
-
-      <Pressable style={[styles.button, { backgroundColor: '#f44336' }]} onPress={handleDeleteAccount}>
-        <Text style={styles.buttonText}>Delete Account</Text>
-      </Pressable>
+))}
+        
+      </ScrollView>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0e0e10', padding: 24 },
-  logo: { fontSize: 36, fontWeight: '800', color: '#fff', textAlign: 'center', marginBottom: 12 },
-  title: { fontSize: 24, color: '#fff', marginBottom: 20, textAlign: 'center' },
-  avatar: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
-    borderWidth: 2,
-    borderColor: '#10a37f',
-  },
-  label: { color: '#aaa', fontSize: 14, marginTop: 12 },
-  value: { color: '#fff', fontSize: 16, marginBottom: 8 },
-  input: { color: '#fff', borderBottomColor: '#444', borderBottomWidth: 1, fontSize: 16, paddingVertical: 4 },
-  button: { backgroundColor: '#10a37f', marginTop: 20, padding: 14, borderRadius: 8 },
-  buttonText: { textAlign: 'center', fontWeight: '600', fontSize: 16, color: '#fff' },
 
-  avatarWrapper: {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#0e0e10',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+  },
+  header: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 20,
+    marginBottom: 30,
+  },
+  avatarWrapper: {
     position: 'relative',
+    marginRight: 12,
   },
-  removeBtn: {
-    marginTop: 10,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    backgroundColor: '#333',
-    borderRadius: 6,
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
-  removeText: {
-    color: '#ff4444',
-    fontSize: 14,
-    fontWeight: '500',
-    textAlign: 'center',
+  placeholder: {
+    backgroundColor: '#1a1a1a',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   penIcon: {
     position: 'absolute',
@@ -223,7 +148,40 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 2,
   },
-
-  
-
+  modalContainer: {
+    flex: 1,
+    backgroundColor: '#000000cc',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  fullImage: {
+    width: '90%',
+    height: '70%',
+    borderRadius: 12,
+  },
+  name: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: '600',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderBottomColor: '#222',
+    borderBottomWidth: 1,
+  },
+  rowLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  rowText: {
+    color: '#fff',
+    fontSize: 16,
+  },
 });
