@@ -45,7 +45,7 @@ export default function Login() {
         <Text style={styles.buttonText}>Login</Text>
       </Pressable>
 
-      <TouchableOpacity onPress={() => router.push('/auth/Register')}>
+      <TouchableOpacity onPress={() => router.push('/auth/register')}>
         <Text style={styles.link}>Don’t have an account? <Text style={styles.linkUnderline}>Register</Text></Text>
       </TouchableOpacity>
       <TouchableOpacity onPress={() => router.push('/admin')}>
