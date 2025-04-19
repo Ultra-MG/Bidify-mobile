@@ -1,53 +1,57 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Stack } from 'expo-router';
+import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import 'react-native-reanimated';
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../firebaseConfig';
-import { useState } from 'react';
-import { router } from 'expo-router';
-
 import { useColorScheme } from '@/hooks/useColorScheme';
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [user, setUser] = useState<null | object | undefined>(undefined);
-
-useEffect(() => {
-  const unsub = onAuthStateChanged(auth, (firebaseUser) => {
-    setUser(firebaseUser);
-    if (!firebaseUser) router.replace('/auth/login');
-  });
-  return unsub;
-}, []);
   const colorScheme = useColorScheme();
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
-  
 
   useEffect(() => {
-    if (loaded) {
+    const unsub = onAuthStateChanged(auth, (firebaseUser) => {
+      setUser(firebaseUser);
+      if (!firebaseUser) {
+        router.replace('/auth/login');
+      }
+      
+    });
+    return unsub;
+  }, []);
+
+  useEffect(() => {
+    if (loaded && user !== undefined) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+  }, [loaded, user]);
 
-  if (!loaded) {
+  // ⏳ Prevent screen flash until we know user state
+  if (!loaded || user === undefined) {
     return null;
   }
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        {user ? (
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        ) : (
+          <Stack.Screen name="auth" options={{ headerShown: false }} />
+        )}
         <Stack.Screen name="+not-found" />
       </Stack>
       <StatusBar style="auto" />
     </ThemeProvider>
   );
+  
 }

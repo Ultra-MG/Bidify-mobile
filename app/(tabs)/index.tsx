@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, TextInput, ScrollView, StyleSheet, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import { auth } from '../../firebaseConfig'; // adjust path as needed
 import ProductHorizontalCard from '../product/ProductHorizontalCard'; // Adjust path based on actual location
 
 const categories = [
@@ -19,12 +20,23 @@ export default function HomeScreen() {
   const [loading, setLoading] = useState(true);
 
   const fetchRecommended = async () => {
-    // 🔁 Simulate external API
-    const response = await fetch('https://mocki.io/v1/63d041a7-8c08-4bc3-bec9-b6c252be1c66'); // Replace with real API
-    const data = await response.json();
-    setRecommended(data);
-    setLoading(false);
+    try {
+      const userId = auth.currentUser?.uid;
+      if (!userId) return;
+  
+      const response = await fetch(
+        `https://us-central1-bidifymobile.cloudfunctions.net/recommendations?userId=${userId}`
+      );
+      const data = await response.json();
+      console.log("Recommended:", data);
+      setRecommended(data);
+      setLoading(false);
+    } catch (error) {
+      console.error('Failed to fetch recommendations:', error);
+      setLoading(false);
+    }
   };
+  
 
   useEffect(() => {
     fetchRecommended();
@@ -51,7 +63,7 @@ export default function HomeScreen() {
       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
         {categories.map((cat, index) => (
           <Pressable key={index} style={styles.categoryCard} onPress={() => router.push(`/products?cat=${cat.name.toLowerCase()}`)}>
-            <Ionicons name={cat.icon} size={24} color="#10a37f" />
+            <Ionicons name={cat.icon as any} size={24} color="#10a37f" />
             <Text style={styles.categoryText}>{cat.name}</Text>
           </Pressable>
         ))}
