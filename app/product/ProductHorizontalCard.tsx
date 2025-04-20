@@ -9,9 +9,9 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
     <Pressable style={styles.card} onPress={() => router.push(`../product/${product.id}`)}>
       <Image source={{ uri: imageUri }} style={styles.image} />
       <View style={styles.info}>
-        <Text style={styles.title} numberOfLines={1}>{product.title}</Text>
-        <Text style={styles.price}>${product.price}</Text>
-        <Text style={styles.status}>{product.statusId}</Text>
+        <Text style={styles.title} numberOfLines={1}>{product.name}</Text>
+        <Text style={styles.price}>${product.startPrice}</Text>
+        <Text style={styles.status}>{product.status}</Text>
       </View>
     </Pressable>
   );

@@ -24,7 +24,7 @@ export default function RootLayout() {
 
   return (
     <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name={user ? '/home' : 'authentication/login'} />
+      <Stack.Screen name={user ? '(tabs)' : 'authentication/login'} />
     </Stack>
   );
 }

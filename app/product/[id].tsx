@@ -55,32 +55,33 @@ export default function ProductDetail() {
             </Pressable>
           ))}
         </ScrollView>
-  
+
         <View style={styles.details}>
-          <Text style={styles.title}>{product.title}</Text>
-          <Text style={styles.price}>${product.price}</Text>
+          <Text style={styles.name}>{product.name}</Text>
+          <Text style={styles.price}>${product.startPrice}</Text>
           <Text style={styles.description}>{product.description}</Text>
-          <Text style={styles.meta}>Status: {product.statusId}</Text>
+          <Text style={styles.meta}>Status: {product.status}</Text>
           <Text style={styles.meta}>Category: {product.cat1Id} / {product.cat2Id}</Text>
         </View>
+
       </ScrollView>
-  
+
       {/* ✅ INSERT THIS BLOCK RIGHT HERE */}
       <Modal visible={modalVisible} transparent={true}>
-  <View style={{ flex: 1, backgroundColor: 'black' }}>
-    <ImageViewer
-      imageUrls={product.photos.map((uri: string) => ({ url: uri }))}
-      index={selectedImageIndex}
-      onSwipeDown={() => setModalVisible(false)}
-      enableSwipeDown
-      backgroundColor="black"
-      enablePreload
-    />
-    <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeBtn}>
-      <Text style={styles.closeText}>✕</Text>
-    </TouchableOpacity>
-  </View>
-</Modal>
+        <View style={{ flex: 1, backgroundColor: 'black' }}>
+          <ImageViewer
+            imageUrls={product.photos.map((uri: string) => ({ url: uri }))}
+            index={selectedImageIndex}
+            onSwipeDown={() => setModalVisible(false)}
+            enableSwipeDown
+            backgroundColor="black"
+            enablePreload
+          />
+          <TouchableOpacity onPress={() => setModalVisible(false)} style={styles.closeBtn}>
+            <Text style={styles.closeText}>✕</Text>
+          </TouchableOpacity>
+        </View>
+      </Modal>
     </>
   );
 }
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
   details: {
     padding: 16,
   },
-  title: {
+  name: {
     fontSize: 24,
     fontWeight: '700',
     color: '#fff',
@@ -149,6 +150,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 20,
   },
-  
-  
+
+
 });

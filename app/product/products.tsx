@@ -48,8 +48,8 @@ export default function ProductListScreen() {
       setFilteredProducts(
         searchParam
           ? list.filter((p: any) =>
-              p.title?.toLowerCase().includes(searchParam.toLowerCase())
-            )
+            p.name?.toLowerCase().includes(searchParam.toLowerCase())
+          )          
           : list
       );
     } catch (err) {
@@ -67,8 +67,8 @@ export default function ProductListScreen() {
   useEffect(() => {
     const q = searchInput.toLowerCase();
     const filtered = products.filter(p =>
-      p.title?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
-    );
+      p.name?.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q)
+    );    
     setFilteredProducts(filtered);
   }, [searchInput, products]);
   
