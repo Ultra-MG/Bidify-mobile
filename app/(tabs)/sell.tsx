@@ -191,14 +191,14 @@ export default function SellScreen() {
             </Pressable>
           ) : (
             <View style={{ marginHorizontal: -20 }}>
-<Scrollable
-  horizontal
-  pagingEnabled
-  showsHorizontalScrollIndicator={false}
-  snapToAlignment="center"   // 👈 center each child
-  decelerationRate="fast"
-  bounces={false}
->
+              <Scrollable
+                horizontal
+                pagingEnabled
+                showsHorizontalScrollIndicator={false}
+                snapToAlignment="center"   // 👈 center each child
+                decelerationRate="fast"
+                bounces={false}
+              >
 
 
 
@@ -341,7 +341,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#1c1c1e',
     marginHorizontal: (screenWidth * 0.075), // (100% - 85%) / 2
   },
-  
+
   imageUploadContent: {
     alignItems: 'center',
     justifyContent: 'center',
