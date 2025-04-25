@@ -1,6 +1,5 @@
-
 import * as ImagePicker from 'expo-image-picker';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
@@ -17,8 +16,13 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { auth, db } from '../../firebaseConfig';
 import { doc, getDoc } from 'firebase/firestore';
+import { useTheme } from '../../context/ThemeContext';
+import { Colors } from '../../constants/Colors';
 
 export default function ProfileScreen() {
+  const { theme } = useTheme();
+  const themeColors = Colors[theme];
+
   const [profile, setProfile] = useState<any>(null);
   const [localImage, setLocalImage] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
@@ -41,7 +45,7 @@ export default function ProfileScreen() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
       {/* Header */}
       <View style={styles.header}>
         <Pressable onPress={() => setModalVisible(true)} style={styles.avatarWrapper}>
@@ -49,12 +53,14 @@ export default function ProfileScreen() {
             <Image source={{ uri: localImage }} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.placeholder]}>
-              <Ionicons name="person-circle-outline" size={60} color="#aaa" />
+              <Ionicons name="person-circle-outline" size={60} color={themeColors.icon} />
             </View>
           )}
         </Pressable>
 
-        <Text style={styles.name}>{profile?.name || 'Loading...'}</Text>
+        <Text style={[styles.name, { color: themeColors.text }]}>
+          {profile?.name || 'Loading...'}
+        </Text>
       </View>
 
       {/* Modal for full image */}
@@ -70,54 +76,54 @@ export default function ProfileScreen() {
 
       {/* Scrollable Actions */}
       <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 40 }}>
-      {[
-  { label: 'Edit Profile', icon: 'create-outline', route: '/profile/editprofile' },
-  { label: 'Cart', icon: 'cart-outline', route: '/cart/cart' },
-  { label: 'Settings', icon: 'settings-outline', route: '/settings/settings' },
-  { label: 'Chats', icon: 'chatbubble-outline', route: '/chats' },
-  {
-    label: 'Logout',
-    icon: 'log-out-outline',
-    action: () => {
-      Alert.alert('Confirm Logout', 'Are you sure you want to logout?', [
-        { text: 'Cancel', style: 'cancel' },
-        {
-          text: 'Logout',
-          onPress: async () => {
-            await auth.signOut();
-            router.replace('/authentication/login');
+        {[
+          { label: 'Edit Profile', icon: 'create-outline', route: '/profile/editprofile' },
+          { label: 'Cart', icon: 'cart-outline', route: '/cart/cart' },
+          { label: 'Settings', icon: 'settings-outline', route: '/settings/settings' },
+          { label: 'Chats', icon: 'chatbubble-outline', route: '/chats' },
+          {
+            label: 'Logout',
+            icon: 'log-out-outline',
+            action: () => {
+              Alert.alert('Confirm Logout', 'Are you sure you want to logout?', [
+                { text: 'Cancel', style: 'cancel' },
+                {
+                  text: 'Logout',
+                  onPress: async () => {
+                    await auth.signOut();
+                    router.replace('/authentication/login');
+                  },
+                },
+              ]);
+            },
           },
-        },
-      ]);
-    },
-  }
-  
-].map((item, i) => (
-  <Pressable key={i} style={styles.row} onPress={() => {
-    if (item.route) {
-      router.push(item.route as any);
-    } else if (item.action) {
-      item.action();
-    }
-  }}>
-    <View style={styles.rowLeft}>
-      <Ionicons name={item.icon as any} size={20} color="#10a37f" />
-      <Text style={styles.rowText}>{item.label}</Text>
-    </View>
-    <Ionicons name="chevron-forward" size={20} color="#888" />
-  </Pressable>
-))}
-        
+        ].map((item, i) => (
+          <Pressable
+            key={i}
+            style={[styles.row, { borderBottomColor: themeColors.cardBorder }]}
+            onPress={() => {
+              if (item.route) {
+                router.push(item.route as any);
+              } else if (item.action) {
+                item.action();
+              }
+            }}
+          >
+            <View style={styles.rowLeft}>
+              <Ionicons name={item.icon as any} size={20} color={themeColors.tint} />
+              <Text style={[styles.rowText, { color: themeColors.text }]}>{item.label}</Text>
+            </View>
+            <Ionicons name="chevron-forward" size={20} color={themeColors.icon} />
+          </Pressable>
+        ))}
       </ScrollView>
     </View>
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0e0e10',
     paddingTop: 60,
     paddingHorizontal: 20,
   },
@@ -136,17 +142,8 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   placeholder: {
-    backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  penIcon: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#10a37f',
-    borderRadius: 10,
-    padding: 2,
   },
   modalContainer: {
     flex: 1,
@@ -160,7 +157,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
   },
   name: {
-    color: '#fff',
     fontSize: 20,
     fontWeight: '600',
   },
@@ -172,7 +168,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingVertical: 16,
-    borderBottomColor: '#222',
     borderBottomWidth: 1,
   },
   rowLeft: {
@@ -181,7 +176,6 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   rowText: {
-    color: '#fff',
     fontSize: 16,
   },
 });

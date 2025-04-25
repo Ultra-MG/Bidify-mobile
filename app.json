@@ -17,7 +17,9 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.anonymous.bidifymobile"
+      "package": "com.anonymous.bidifymobile",
+      "useNextNotificationsApi": true,
+      "permissions": ["NOTIFICATIONS"]
     },
     "web": {
       "bundler": "metro",
@@ -39,6 +41,5 @@
     "experiments": {
       "typedRoutes": true
     }
-    
   }
 }

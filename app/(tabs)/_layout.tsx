@@ -1,18 +1,24 @@
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../context/ThemeContext';
+import { Colors } from '../../constants/Colors';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 export default function TabLayout() {
+  const Tab = createBottomTabNavigator();
+  const { theme } = useTheme();
+  const themeColors = Colors[theme];
   return (
     
     <Tabs
       initialRouteName="home"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#10a37f',
-        tabBarInactiveTintColor: '#aaa',
+        tabBarActiveTintColor:  themeColors.tint,
+        tabBarInactiveTintColor:  themeColors.icon,
         tabBarStyle: {
-          backgroundColor: '#0e0e10',
-          borderTopColor: '#222',
+          backgroundColor: themeColors.background,
+          borderTopColor: themeColors.cardBorder,
           paddingBottom: 6,
           paddingTop: 6,
           height: 60,

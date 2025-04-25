@@ -1,12 +1,24 @@
 import { useState } from 'react';
-import { View, Text, TextInput, Alert, StyleSheet, Pressable, TouchableOpacity } from 'react-native';
-import { createUserWithEmailAndPassword } from 'firebase/auth';
+import {
+  View,
+  Text,
+  TextInput,
+  Alert,
+  StyleSheet,
+  Pressable,
+  TouchableOpacity,
+} from 'react-native';
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth';
 import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { auth, db } from '../../firebaseConfig';
 import { router } from 'expo-router';
-import { sendEmailVerification } from 'firebase/auth';
+import { useTheme } from '../../context/ThemeContext';
+import { Colors } from '../../constants/Colors';
 
 export default function Register() {
+  const { theme } = useTheme();
+  const themeColors = Colors[theme];
+
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -30,38 +42,113 @@ export default function Register() {
         age: Number(age),
         createdAt: Timestamp.now(),
       });
-      
-      // ✅ Send verification email
+
       await sendEmailVerification(userCredential.user);
       router.replace({
         pathname: '/verify',
         params: { fromRegister: '1' }
       });
-      
-      
-      router.replace('/verify');
+
     } catch (error: any) {
       Alert.alert('Registration Failed', error.message);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.logo}>Bidify</Text>
-      <Text style={styles.title}>Create your account</Text>
+    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
+      <Text style={[styles.logo, { color: themeColors.text }]}>Bidify</Text>
+      <Text style={[styles.title, { color: themeColors.icon }]}>Create your account</Text>
 
-      <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor="#888" value={name} onChangeText={setName} />
-      <TextInput style={styles.input} placeholder="Email" placeholderTextColor="#888" value={email} onChangeText={setEmail} autoCapitalize="none" keyboardType="email-address" />
-      <TextInput style={styles.input} placeholder="Phone" placeholderTextColor="#888" value={phone} onChangeText={setPhone} keyboardType="phone-pad" />
-      <TextInput style={styles.input} placeholder="Age" placeholderTextColor="#888" value={age} onChangeText={setAge} keyboardType="numeric" />
-      <TextInput style={styles.input} placeholder="Password" placeholderTextColor="#888" value={password} onChangeText={setPassword} secureTextEntry />
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: themeColors.cardBackground,
+            borderColor: themeColors.cardBorder,
+            color: themeColors.text,
+          },
+        ]}
+        placeholder="Full Name"
+        placeholderTextColor={themeColors.icon}
+        value={name}
+        onChangeText={setName}
+      />
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: themeColors.cardBackground,
+            borderColor: themeColors.cardBorder,
+            color: themeColors.text,
+          },
+        ]}
+        placeholder="Email"
+        placeholderTextColor={themeColors.icon}
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+        keyboardType="email-address"
+      />
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: themeColors.cardBackground,
+            borderColor: themeColors.cardBorder,
+            color: themeColors.text,
+          },
+        ]}
+        placeholder="Phone"
+        placeholderTextColor={themeColors.icon}
+        value={phone}
+        onChangeText={setPhone}
+        keyboardType="phone-pad"
+      />
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: themeColors.cardBackground,
+            borderColor: themeColors.cardBorder,
+            color: themeColors.text,
+          },
+        ]}
+        placeholder="Age"
+        placeholderTextColor={themeColors.icon}
+        value={age}
+        onChangeText={setAge}
+        keyboardType="numeric"
+      />
+      <TextInput
+        style={[
+          styles.input,
+          {
+            backgroundColor: themeColors.cardBackground,
+            borderColor: themeColors.cardBorder,
+            color: themeColors.text,
+          },
+        ]}
+        placeholder="Password"
+        placeholderTextColor={themeColors.icon}
+        value={password}
+        onChangeText={setPassword}
+        secureTextEntry
+      />
 
-      <Pressable style={styles.button} onPress={handleRegister}>
-        <Text style={styles.buttonText}>Register</Text>
+      <Pressable
+        style={[styles.button, { backgroundColor: themeColors.tint }]}
+        onPress={handleRegister}
+      >
+        <Text style={[styles.buttonText, { color: '#fff' }]}>Register</Text>
       </Pressable>
 
       <TouchableOpacity onPress={() => router.push('/authentication/login')}>
-        <Text style={styles.link}>Already have an account? <Text style={styles.linkUnderline}>Login</Text></Text>
+        <Text style={[styles.link, { color: themeColors.icon }]}>
+          Already have an account?{' '}
+          <Text style={[styles.linkUnderline, { color: themeColors.text }]}>
+            Login
+          </Text>
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -70,7 +157,6 @@ export default function Register() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0e0e10',
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
@@ -78,42 +164,37 @@ const styles = StyleSheet.create({
   logo: {
     fontSize: 36,
     fontWeight: '800',
-    color: '#fff',
     marginBottom: 8,
   },
   title: {
     fontSize: 18,
-    color: '#aaa',
     marginBottom: 32,
   },
   input: {
     width: '100%',
-    borderBottomWidth: 1,
-    borderBottomColor: '#333',
-    color: '#fff',
     fontSize: 16,
-    paddingVertical: 12,
-    marginBottom: 24,
+    padding: 14,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 16,
   },
   button: {
     width: '100%',
-    backgroundColor: '#10a37f',
     paddingVertical: 14,
     borderRadius: 8,
+    marginTop: 12,
     marginBottom: 24,
   },
   buttonText: {
-    color: '#fff',
     fontWeight: '600',
     fontSize: 16,
     textAlign: 'center',
   },
   link: {
-    color: '#aaa',
     fontSize: 14,
+    textAlign: 'center',
   },
   linkUnderline: {
-    color: '#fff',
     textDecorationLine: 'underline',
   },
 });

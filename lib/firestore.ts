@@ -1,4 +1,4 @@
-import {
+/*import {
     collection,
     doc,
     getDoc,
@@ -168,4 +168,4 @@ import {
     const snap = await getDocs(collection(db, 'product_status'));
     return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
   };
-  
+  */

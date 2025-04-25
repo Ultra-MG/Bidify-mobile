@@ -54,7 +54,7 @@ const demoImages3 = [
 export const seedProducts = async () => {
   const demoProducts = [
     {
-      id: 'iphone10',
+      name: 'iphone10',
       title: 'iPhone 15 Pro Max',
       description: '256GB, Titanium Blue, A17 Pro chip',
       price: 1399,
@@ -63,7 +63,7 @@ export const seedProducts = async () => {
       statusId: 'available',
       ownerId: 'admin123',
       createdAt: new Date(),
-      photos: demoImages1,
+      images: demoImages1,
       mainPhotoIndex: 0,
     },
     {
