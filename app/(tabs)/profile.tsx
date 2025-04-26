@@ -1,7 +1,7 @@
-import * as ImagePicker from 'expo-image-picker';
-import { Ionicons } from '@expo/vector-icons';
-import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
+import * as ImagePicker from "expo-image-picker";
+import { Ionicons } from "@expo/vector-icons";
+import { router } from "expo-router";
+import { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -12,32 +12,28 @@ import {
   Alert,
   Modal,
   TouchableOpacity,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { auth, db } from '../../firebaseConfig';
-import { doc, getDoc } from 'firebase/firestore';
-import { useTheme } from '../../context/ThemeContext';
-import { Colors } from '../../constants/Colors';
-
+} from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { auth, db } from "../../firebaseConfig";
+import { doc, getDoc } from "firebase/firestore";
+import { useTheme } from "../../context/ThemeContext";
+import { Colors } from "../../constants/Colors";
+import Toast from 'react-native-toast-message';
 export default function ProfileScreen() {
   const { theme } = useTheme();
   const themeColors = Colors[theme];
 
   const [profile, setProfile] = useState<any>(null);
-  const [localImage, setLocalImage] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
 
   const loadProfile = async () => {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
 
-    const userSnap = await getDoc(doc(db, 'users', uid));
+    const userSnap = await getDoc(doc(db, "users", uid));
     if (userSnap.exists()) {
       setProfile(userSnap.data());
     }
-
-    const storedUri = await AsyncStorage.getItem('profilePhoto');
-    if (storedUri) setLocalImage(storedUri);
   };
 
   useEffect(() => {
@@ -45,56 +41,85 @@ export default function ProfileScreen() {
   }, []);
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      {/* Header */}
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
+      {}
       <View style={styles.header}>
-        <Pressable onPress={() => setModalVisible(true)} style={styles.avatarWrapper}>
-          {localImage ? (
-            <Image source={{ uri: localImage }} style={styles.avatar} />
+        <Pressable
+          onPress={() => setModalVisible(true)}
+          style={styles.avatarWrapper}
+        >
+          {profile?.photoURL ? (
+            <Image source={{ uri: profile.photoURL }} style={styles.avatar} />
           ) : (
             <View style={[styles.avatar, styles.placeholder]}>
-              <Ionicons name="person-circle-outline" size={60} color={themeColors.icon} />
+              <Ionicons
+                name="person-circle-outline"
+                size={60}
+                color={themeColors.icon}
+              />
             </View>
           )}
         </Pressable>
 
         <Text style={[styles.name, { color: themeColors.text }]}>
-          {profile?.name || 'Loading...'}
+          {profile?.name || "Loading..."}
         </Text>
       </View>
 
-      {/* Modal for full image */}
+      {}
       <Modal visible={modalVisible} transparent={true}>
-        <TouchableOpacity style={styles.modalContainer} onPress={() => setModalVisible(false)}>
+        <TouchableOpacity
+          style={styles.modalContainer}
+          onPress={() => setModalVisible(false)}
+        >
           <Image
-            source={{ uri: localImage || 'https://via.placeholder.com/300' }}
+            source={{
+              uri: profile?.photoURL || "https://via.placeholder.com/300",
+            }}
             style={styles.fullImage}
             resizeMode="contain"
           />
         </TouchableOpacity>
       </Modal>
 
-      {/* Scrollable Actions */}
-      <ScrollView style={styles.scrollContainer} contentContainerStyle={{ paddingBottom: 40 }}>
+      {}
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{ paddingBottom: 40 }}
+      >
         {[
-          { label: 'Edit Profile', icon: 'create-outline', route: '/profile/editprofile' },
-          { label: 'Cart', icon: 'cart-outline', route: '/cart/cart' },
-          { label: 'Settings', icon: 'settings-outline', route: '/settings/settings' },
-          { label: 'Chats', icon: 'chatbubble-outline', route: '/chats' },
           {
-            label: 'Logout',
-            icon: 'log-out-outline',
+            label: "Edit Profile",
+            icon: "create-outline",
+            route: "/profile/editprofile",
+          },
+          { label: "Cart", icon: "cart-outline", route: "/cart/cart" },
+          {
+            label: "Settings",
+            icon: "settings-outline",
+            route: "/settings/settings",
+          },
+          { label: "Chats", icon: "chatbubble-outline", route: "/chats" },
+          {
+            label: "Logout",
+            icon: "log-out-outline",
             action: () => {
-              Alert.alert('Confirm Logout', 'Are you sure you want to logout?', [
-                { text: 'Cancel', style: 'cancel' },
-                {
-                  text: 'Logout',
-                  onPress: async () => {
-                    await auth.signOut();
-                    router.replace('/authentication/login');
+              Alert.alert(
+                "Confirm Logout",
+                "Are you sure you want to logout?",
+                [
+                  { text: "Cancel", style: "cancel" },
+                  {
+                    text: "Logout",
+                    onPress: async () => {
+                      await auth.signOut();
+                      router.replace("/authentication/login");
+                    },
                   },
-                },
-              ]);
+                ]
+              );
             },
           },
         ].map((item, i) => (
@@ -110,10 +135,20 @@ export default function ProfileScreen() {
             }}
           >
             <View style={styles.rowLeft}>
-              <Ionicons name={item.icon as any} size={20} color={themeColors.tint} />
-              <Text style={[styles.rowText, { color: themeColors.text }]}>{item.label}</Text>
+              <Ionicons
+                name={item.icon as any}
+                size={20}
+                color={themeColors.tint}
+              />
+              <Text style={[styles.rowText, { color: themeColors.text }]}>
+                {item.label}
+              </Text>
             </View>
-            <Ionicons name="chevron-forward" size={20} color={themeColors.icon} />
+            <Ionicons
+              name="chevron-forward"
+              size={20}
+              color={themeColors.icon}
+            />
           </Pressable>
         ))}
       </ScrollView>
@@ -128,12 +163,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 30,
   },
   avatarWrapper: {
-    position: 'relative',
+    position: "relative",
     marginRight: 12,
   },
   avatar: {
@@ -142,37 +177,37 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   placeholder: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
   },
   modalContainer: {
     flex: 1,
-    backgroundColor: '#000000cc',
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: "#000000cc",
+    justifyContent: "center",
+    alignItems: "center",
   },
   fullImage: {
-    width: '90%',
-    height: '70%',
+    width: "90%",
+    height: "70%",
     borderRadius: 12,
   },
   name: {
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: "600",
   },
   scrollContainer: {
     flex: 1,
   },
   row: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingVertical: 16,
     borderBottomWidth: 1,
   },
   rowLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 12,
   },
   rowText: {

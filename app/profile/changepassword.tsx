@@ -46,7 +46,7 @@ export default function ChangePassword() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: themeColors.background }]}>
       
-      {/* Back Button and Title */}
+      {}
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} style={{ padding: 4 }}>
           <Ionicons name="arrow-back" size={28} color={themeColors.tint} />
@@ -54,7 +54,7 @@ export default function ChangePassword() {
         <Text style={[styles.pageTitle, { color: themeColors.text }]}>Change Password</Text>
       </View>
 
-      {/* Inputs */}
+      {}
       <TextInput
         placeholder="Old Password"
         secureTextEntry
@@ -92,7 +92,7 @@ export default function ChangePassword() {
         placeholderTextColor={themeColors.icon}
       />
 
-      {/* Button */}
+      {}
       <Pressable
         style={[styles.button, { backgroundColor: themeColors.tint }]}
         onPress={async () => {

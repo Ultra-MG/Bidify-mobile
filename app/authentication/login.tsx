@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   View,
   Text,
@@ -6,42 +6,56 @@ import {
   TouchableOpacity,
   StyleSheet,
   Pressable,
-} from 'react-native';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { doc, setDoc } from 'firebase/firestore';
-import { auth, db } from '../../firebaseConfig';
-import { router } from 'expo-router';
-import { registerForPushNotificationsAsync } from '../../lib/notifications';
-import { useTheme } from '../../context/ThemeContext';
-import { Colors } from '../../constants/Colors';
+} from "react-native";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { auth, db } from "../../firebaseConfig";
+import { router } from "expo-router";
+import { registerForPushNotificationsAsync } from "../../lib/notifications";
+import { useTheme } from "../../context/ThemeContext";
+import { Colors } from "../../constants/Colors";
+import { Image } from "react-native";
+import { ActivityIndicator } from "react-native";
+
 
 export default function Login() {
   const { theme } = useTheme();
   const themeColors = Colors[theme];
+  const [submitting, setSubmitting] = useState(false);
 
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const handleLogin = async () => {
+    setSubmitting(true);
     try {
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-
-      const token = await registerForPushNotificationsAsync();
-      if (token) {
-        await setDoc(doc(db, 'users', user.uid), { pushToken: token }, { merge: true });
-      }
-
-      router.replace('/home');
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      router.replace("/home");
     } catch (error: any) {
       alert(error.message);
     }
+ finally {
+    setSubmitting(false);
+  }
   };
 
   return (
-    <View style={[styles.container, { backgroundColor: themeColors.background }]}>
-      <Text style={[styles.logo, { color: themeColors.text }]}>Bidify</Text>
-      <Text style={[styles.title, { color: themeColors.icon }]}>Welcome back</Text>
+    <View
+      style={[styles.container, { backgroundColor: themeColors.background }]}
+    >
+      <Image
+        source={require("../../assets/images/splash.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
+
+      <Text style={[styles.title, { color: themeColors.icon }]}>
+        Welcome back
+      </Text>
 
       <TextInput
         style={[
@@ -76,24 +90,38 @@ export default function Login() {
         secureTextEntry
       />
 
-      <Pressable
-        style={[styles.button, { backgroundColor: themeColors.tint }]}
-        onPress={handleLogin}
-      >
-        <Text style={[styles.buttonText, { color: '#fff' }]}>Login</Text>
-      </Pressable>
+<Pressable
+  style={[
+    styles.button,
+    {
+      backgroundColor: themeColors.tint,
+      opacity: submitting ? 0.6 : 1, // fade when submitting
+    },
+  ]}
+  onPress={handleLogin}
+  disabled={submitting} // disable while loading
+>
+  {submitting ? (
+    <ActivityIndicator color="#fff" />
+  ) : (
+    <Text style={[styles.buttonText, { color: "#fff" }]}>Login</Text>
+  )}
+</Pressable>
 
-      <TouchableOpacity onPress={() => router.push('/authentication/register')}>
+
+      <TouchableOpacity onPress={() => router.push("/authentication/register")}>
         <Text style={[styles.link, { color: themeColors.icon }]}>
-          Don’t have an account?{' '}
+          Don’t have an account?{" "}
           <Text style={[styles.linkUnderline, { color: themeColors.text }]}>
             Register
           </Text>
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push('/admin')}>
-        <Text style={{ color: themeColors.tint, marginTop: 16 }}>Open Admin</Text>
+      <TouchableOpacity onPress={() => router.push("/admin")}>
+        <Text style={{ color: themeColors.tint, marginTop: 16 }}>
+          Open Admin
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -102,21 +130,22 @@ export default function Login() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     padding: 24,
   },
   logo: {
-    fontSize: 36,
-    fontWeight: '800',
-    marginBottom: 8,
+    width: 200,
+    height: 200,
+    marginBottom: 0, 
   },
   title: {
     fontSize: 18,
     marginBottom: 32,
+    marginTop: -40, 
   },
   input: {
-    width: '100%',
+    width: "100%",
     borderWidth: 1,
     borderRadius: 10,
     fontSize: 16,
@@ -124,22 +153,22 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   button: {
-    width: '100%',
+    width: "100%",
     paddingVertical: 14,
     borderRadius: 8,
     marginTop: 12,
     marginBottom: 24,
   },
   buttonText: {
-    fontWeight: '600',
+    fontWeight: "600",
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
   },
   link: {
     fontSize: 14,
-    textAlign: 'center',
+    textAlign: "center",
   },
   linkUnderline: {
-    textDecorationLine: 'underline',
+    textDecorationLine: "underline",
   },
 });

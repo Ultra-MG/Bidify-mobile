@@ -18,17 +18,21 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
 import { Colors } from "../../constants/Colors";
-
+import { storage } from "../../firebaseConfig";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { signOut } from "firebase/auth";
+import Toast from 'react-native-toast-message'; 
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [localImage, setLocalImage] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [age, setAge] = useState("");
-  const [newPassword, setNewPassword] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const { theme } = useTheme();
+  const [saving, setSaving] = useState(false);
   const themeColors = Colors[theme];
   const loadProfile = async () => {
     const uid = auth.currentUser?.uid;
@@ -43,13 +47,31 @@ export default function ProfileScreen() {
       setAge(data.age.toString());
     }
 
-    const storedUri = await AsyncStorage.getItem("profilePhoto");
-    if (storedUri) setLocalImage(storedUri);
-
     setLoading(false);
   };
+  const uploadProfileImage = async (uri: string) => {
+    if (!auth.currentUser) return null;
 
+    const response = await fetch(uri);
+    const blob = await response.blob();
+
+    const filename = `profile_photos/${auth.currentUser.uid}_${Date.now()}.jpg`;
+    const storageRef = ref(storage, filename);
+
+    await uploadBytes(storageRef, blob);
+
+    const downloadURL = await getDownloadURL(storageRef);
+    return downloadURL;
+  };
+  const saveProfilePhoto = async (photoURL: string) => {
+    if (!auth.currentUser) return;
+
+    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+      photoURL: photoURL,
+    });
+  };
   const saveProfile = async () => {
+    setSaving(true);
     const uid = auth.currentUser?.uid;
     if (!uid) return;
 
@@ -61,10 +83,21 @@ export default function ProfileScreen() {
       });
       setProfile({ ...profile, name, phone, age: Number(age) });
       setEditing(false);
-      Alert.alert("Profile updated");
+      Toast.show({
+        type: 'success',
+        text1: 'Profile Updated',
+        text2: 'Your changes were saved successfully!',
+      });
     } catch (err) {
       console.error(err);
-      Alert.alert("Update failed");
+      Toast.show({
+        type: 'error',
+        text1: 'Save Failed',
+        text2: '❌ Could not save changes. Try again later.',
+      });
+    }
+    finally {
+      setSaving(false);
     }
   };
 
@@ -77,47 +110,72 @@ export default function ProfileScreen() {
 
     if (!result.canceled && result.assets?.length) {
       const uri = result.assets[0].uri;
-      setLocalImage(uri);
-      await AsyncStorage.setItem("profilePhoto", uri);
+
+      try {
+        const uploadedUrl = await uploadProfileImage(uri);
+
+        if (uploadedUrl) {
+          await saveProfilePhoto(uploadedUrl);
+
+          setProfile((prev: any) => ({
+            ...prev,
+            photoURL: uploadedUrl,
+          }));
+
+          Alert.alert("✅ Profile photo updated!");
+        }
+      } catch (error) {
+        console.error("Failed to upload photo:", error);
+        Alert.alert("❌ Failed to upload photo.");
+      }
     }
   };
 
   const removeImage = async () => {
-    await AsyncStorage.removeItem("profilePhoto");
-    setLocalImage(null);
-  };
+    const uid = auth.currentUser?.uid;
+    if (!uid) return;
 
-  const handlePasswordUpdate = async () => {
-    if (!newPassword) return;
     try {
-      if (!auth.currentUser) {
-        Alert.alert("You must be logged in to update your password.");
-        return;
-      }
+      await updateDoc(doc(db, "users", uid), {
+        photoURL: null,
+      });
 
-      await updatePassword(auth.currentUser, newPassword);
-      setNewPassword("");
-    } catch (error: any) {
-      console.error(error);
-      Alert.alert("❌ Failed to update password", error.message);
+      setProfile((prev: any) => ({
+        ...prev,
+        photoURL: null,
+      }));
+
+      Alert.alert("✅ Profile photo removed.");
+    } catch (error) {
+      console.error("Failed to remove photo:", error);
+      Alert.alert("❌ Failed to remove photo.");
     }
   };
 
   const handleDeleteAccount = async () => {
     try {
-      const uid = auth.currentUser?.uid;
-      if (!uid) return;
-
-      if (!auth.currentUser) {
-        Alert.alert("You must be logged in to delete your accounr.");
-        return;
+      setDeleting(true);
+      const user = auth.currentUser;
+      if (user) {
+        await user.delete();  // delete account
+        Toast.show({
+          type: 'success',
+          text1: 'Account Deleted',
+          text2: '✅ Your account has been successfully deleted!',
+        });
+  
+        await signOut(auth);  // logout after delete
+        router.replace("/authentication/login"); // go back to login
       }
-      await deleteDoc(doc(db, "users", uid));
-      await deleteUser(auth.currentUser);
-      Alert.alert("🗑 Account deleted successfully");
-    } catch (error: any) {
-      console.error(error);
-      Alert.alert("❌ Could not delete account", error.message);
+    } catch (error) {
+      console.error("Delete account failed:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Delete Failed',
+        text2: '❌ Please try again later.',
+      });
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -145,16 +203,17 @@ export default function ProfileScreen() {
         <Pressable onPress={pickImage}>
           <Image
             source={{
-              uri: localImage || "https://via.placeholder.com/100",
+              uri: profile?.photoURL || "https://via.placeholder.com/100",
             }}
             style={[styles.avatar, { borderColor: themeColors.tint }]}
           />
+
           <View style={[styles.penIcon, { backgroundColor: themeColors.tint }]}>
             <MaterialIcons name="edit" size={20} color="#fff" />
           </View>
         </Pressable>
 
-        {localImage && (
+        {profile?.photoURL && (
           <Pressable onPress={removeImage} style={styles.removeBtn}>
             <Text style={{ color: themeColors.wtext, fontSize: 14 }}>
               Remove Photo
@@ -210,31 +269,61 @@ export default function ProfileScreen() {
         onChangeText={setAge}
         keyboardType="numeric"
       />
-      <Pressable
-        style={[
-          styles.button,
-          { backgroundColor: themeColors.buttonBackground },
-        ]}
-        onPress={saveProfile}
-      >
-        <Text style={[styles.buttonText, { color: themeColors.btext }]}>
-          Save Changes
-        </Text>
-      </Pressable>
+<Pressable
+  style={[
+    styles.button,
+    {
+      backgroundColor: themeColors.tint,
+      opacity: submitting ? 0.6 : 1,
+    },
+  ]}
+  onPress={saveProfile}
+  disabled={submitting}
+>
+  {submitting ? (
+    <ActivityIndicator color={themeColors.btext} />
+  ) : (
+    <Text style={[styles.buttonText, { color: themeColors.btext }]}>
+      Save Changes
+    </Text>
+  )}
+</Pressable>
 
-      <Pressable
-        style={[styles.button, { backgroundColor: themeColors.tint }]}
-        onPress={() => router.replace("../profile/changepassword")}
-      >
-        <Text style={styles.buttonText}>Change Password</Text>
-      </Pressable>
+<Pressable
+  style={[
+    styles.button,
+    {
+      backgroundColor: themeColors.tint,
+      opacity: 1,
+    },
+  ]}
+  onPress={() => router.replace("../profile/changepassword")}
+>
+  <Text style={[styles.buttonText, { color: themeColors.btext }]}>
+    Change Password
+  </Text>
+</Pressable>
 
-      <Pressable
-        style={[styles.button, { backgroundColor: "#f44336" }]}
-        onPress={handleDeleteAccount}
-      >
-        <Text style={styles.buttonText}>Delete Account</Text>
-      </Pressable>
+{/* Delete Account Button */}
+<Pressable
+  style={[
+    styles.button,
+    {
+      backgroundColor: "#f44336",
+      opacity: deleting ? 0.6 : 1,
+    },
+  ]}
+  onPress={handleDeleteAccount}
+  disabled={deleting}
+>
+  {deleting ? (
+    <ActivityIndicator color="#fff" />
+  ) : (
+    <Text style={styles.buttonText}>
+      Delete Account
+    </Text>
+  )}
+</Pressable>
     </View>
   );
 }

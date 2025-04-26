@@ -16,6 +16,8 @@ import { db, auth } from "../../firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import ProductHorizontalCard from '../product/ProductHorizontalCard';
+import CartEndedProductCard from "../product/cartProductCard";
+
 import {
   collection,
   query,
@@ -86,7 +88,7 @@ export default function CartScreen() {
     <View
       style={[styles.container, { backgroundColor: themeColors.background }]}
     >
-      {/* Top Header */}
+      {}
       <View style={styles.topBar}>
         <Pressable onPress={() => router.back()} style={{ padding: 4 }}>
           <Ionicons name="arrow-back" size={28} color={themeColors.tint} />
@@ -97,7 +99,7 @@ export default function CartScreen() {
         </Text>
       </View>
 
-      {/* Cart List */}
+      {}
       <FlatList
         contentContainerStyle={{ paddingBottom: 16 }}
         data={cartItems}
@@ -105,7 +107,9 @@ export default function CartScreen() {
         keyExtractor={(item) => item.id}
         columnWrapperStyle={{ justifyContent: "space-between" }}
         renderItem={({ item }) => (
-          <ProductHorizontalCard product={item} />
+          item.ended
+            ? <CartEndedProductCard product={item} />
+            : <ProductHorizontalCard product={item} />
         )}        
       />
     </View>
@@ -129,7 +133,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginLeft: 28, // offset to balance arrow icon
+    marginLeft: 28, 
   },  
   topRight: {
     fontSize: 16,

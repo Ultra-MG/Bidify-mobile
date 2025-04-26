@@ -14,6 +14,8 @@ import { auth, db } from '../../firebaseConfig';
 import { router } from 'expo-router';
 import { useTheme } from '../../context/ThemeContext';
 import { Colors } from '../../constants/Colors';
+import {ActivityIndicator } from "react-native";
+import Toast from 'react-native-toast-message';
 
 export default function Register() {
   const { theme } = useTheme();
@@ -24,10 +26,50 @@ export default function Register() {
   const [phone, setPhone] = useState('');
   const [age, setAge] = useState('');
   const [password, setPassword] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleRegister = async () => {
+    setSubmitting(true);
     if (!name || !email || !phone || !age || !password) {
-      Alert.alert('Error', 'All fields are required.');
+      Toast.show({
+        type: 'error',
+        text1: 'All fields are required.',
+      });
+      return;
+    }
+    if (password.length < 8) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password must be at least 8 characters long.',
+      });
+      return;
+    }
+    if (!/[A-Z]/.test(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password must contain at least one uppercase letter.',
+      });
+      return;
+    }
+    if (!/[a-z]/.test(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password must contain at least one lowercase letter.',
+      });
+      return;
+    }
+    if (!/[0-9]/.test(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password must contain at least one number.',
+      });
+      return;
+    }
+    if (!/[!@#$%^&*/\\]/.test(password)) {
+      Toast.show({
+        type: 'error',
+        text1: 'Password must contain at least one special character (!@#$%^&*).',
+      });
       return;
     }
 
@@ -51,7 +93,8 @@ export default function Register() {
 
     } catch (error: any) {
       Alert.alert('Registration Failed', error.message);
-    }
+    } finally{
+    setSubmitting(false);}
   };
 
   return (
@@ -135,12 +178,23 @@ export default function Register() {
         secureTextEntry
       />
 
-      <Pressable
-        style={[styles.button, { backgroundColor: themeColors.tint }]}
-        onPress={handleRegister}
-      >
-        <Text style={[styles.buttonText, { color: '#fff' }]}>Register</Text>
-      </Pressable>
+<Pressable
+  style={[
+    styles.button,
+    { backgroundColor: themeColors.tint, opacity: submitting ? 0.6 : 1 },
+  ]}
+  onPress={handleRegister}
+  disabled={submitting}
+>
+  {submitting ? (
+    <ActivityIndicator color="#fff" />
+  ) : (
+    <Text style={[styles.buttonText, { color: '#fff' }]}>
+      Register
+    </Text>
+  )}
+</Pressable>
+
 
       <TouchableOpacity onPress={() => router.push('/authentication/login')}>
         <Text style={[styles.link, { color: themeColors.icon }]}>

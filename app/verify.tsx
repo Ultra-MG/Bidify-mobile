@@ -6,7 +6,7 @@ import { router } from 'expo-router';
 import { useLocalSearchParams } from 'expo-router';
 export default function VerifyScreen() {
     
-  const [emailSent, setEmailSent] = useState(true); // sent on register
+  const [emailSent, setEmailSent] = useState(true); 
   const [checking, setChecking] = useState(false);
   const [verified, setVerified] = useState(false);
   const { fromRegister } = useLocalSearchParams();
@@ -66,7 +66,7 @@ export default function VerifyScreen() {
         <Text style={styles.buttonText}>Resend Email</Text>
       </Pressable>
 
-      {/* ✅ Custom Popup */}
+      {}
       {showMessage && (
         <View style={styles.popup}>
           <Text style={styles.popupText}>
