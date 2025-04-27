@@ -21,7 +21,7 @@ import { Colors } from "../../constants/Colors";
 import { storage } from "../../firebaseConfig";
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { signOut } from "firebase/auth";
-import Toast from 'react-native-toast-message'; 
+import Toast from "react-native-toast-message";
 export default function ProfileScreen() {
   const [profile, setProfile] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -72,6 +72,7 @@ export default function ProfileScreen() {
   };
   const saveProfile = async () => {
     setSaving(true);
+    setSubmitting(true);
     const uid = auth.currentUser?.uid;
     if (!uid) return;
 
@@ -84,20 +85,20 @@ export default function ProfileScreen() {
       setProfile({ ...profile, name, phone, age: Number(age) });
       setEditing(false);
       Toast.show({
-        type: 'success',
-        text1: 'Profile Updated',
-        text2: 'Your changes were saved successfully!',
+        type: "success",
+        text1: "Profile Updated",
+        text2: "Your changes were saved successfully!",
       });
     } catch (err) {
       console.error(err);
       Toast.show({
-        type: 'error',
-        text1: 'Save Failed',
-        text2: '❌ Could not save changes. Try again later.',
+        type: "error",
+        text1: "Save Failed",
+        text2: "❌ Could not save changes. Try again later.",
       });
-    }
-    finally {
+    } finally {
       setSaving(false);
+      setSubmitting(false);
     }
   };
 
@@ -157,22 +158,22 @@ export default function ProfileScreen() {
       setDeleting(true);
       const user = auth.currentUser;
       if (user) {
-        await user.delete();  // delete account
+        await user.delete(); // delete account
         Toast.show({
-          type: 'success',
-          text1: 'Account Deleted',
-          text2: '✅ Your account has been successfully deleted!',
+          type: "success",
+          text1: "Account Deleted",
+          text2: "✅ Your account has been successfully deleted!",
         });
-  
-        await signOut(auth);  // logout after delete
+
+        await signOut(auth); // logout after delete
         router.replace("/authentication/login"); // go back to login
       }
     } catch (error) {
       console.error("Delete account failed:", error);
       Toast.show({
-        type: 'error',
-        text1: 'Delete Failed',
-        text2: '❌ Please try again later.',
+        type: "error",
+        text1: "Delete Failed",
+        text2: "❌ Please try again later.",
       });
     } finally {
       setDeleting(false);
@@ -197,7 +198,19 @@ export default function ProfileScreen() {
     <View
       style={[styles.container, { backgroundColor: themeColors.background }]}
     >
-      <Text style={[styles.title, { color: themeColors.text }]}>Profile</Text>
+<View style={styles.topBar}>
+  <Pressable onPress={() => router.back()} style={styles.backButton}>
+    <MaterialIcons name="arrow-back" size={26} color={themeColors.tint} />
+  </Pressable>
+
+  <View style={{ flex: 1, alignItems: 'center' }}>
+    <Text style={[styles.title, { color: themeColors.text }]}>Profile</Text>
+  </View>
+
+  {/* Dummy View to balance space */}
+  <View style={{ width: 35 }} />
+</View>
+
 
       <View style={styles.avatarWrapper}>
         <Pressable onPress={pickImage}>
@@ -214,8 +227,19 @@ export default function ProfileScreen() {
         </Pressable>
 
         {profile?.photoURL && (
-          <Pressable onPress={removeImage} style={styles.removeBtn}>
-            <Text style={{ color: themeColors.wtext, fontSize: 14 }}>
+          <Pressable
+            onPress={removeImage}
+            style={[
+              styles.removeBtn,
+              {
+                backgroundColor: themeColors.background,
+                borderColor: themeColors.tint,
+                opacity: submitting ? 0.6 : 1,
+                borderWidth: 1,
+              },
+            ]}
+          >
+            <Text style={{ color: themeColors.text, fontSize: 14 }}>
               Remove Photo
             </Text>
           </Pressable>
@@ -269,61 +293,61 @@ export default function ProfileScreen() {
         onChangeText={setAge}
         keyboardType="numeric"
       />
-<Pressable
-  style={[
-    styles.button,
-    {
-      backgroundColor: themeColors.tint,
-      opacity: submitting ? 0.6 : 1,
-    },
-  ]}
-  onPress={saveProfile}
-  disabled={submitting}
->
-  {submitting ? (
-    <ActivityIndicator color={themeColors.btext} />
-  ) : (
-    <Text style={[styles.buttonText, { color: themeColors.btext }]}>
-      Save Changes
-    </Text>
-  )}
-</Pressable>
+      <Pressable
+        style={[
+          styles.button,
+          {
+            backgroundColor: themeColors.background,
+            borderColor: themeColors.tint,
+            opacity: submitting ? 0.6 : 1,
+            borderWidth: 1,
+          },
+        ]}
+        onPress={saveProfile}
+        disabled={submitting}
+      >
+        {submitting ? (
+          <ActivityIndicator color={themeColors.text} />
+        ) : (
+          <Text style={[styles.buttonText, { color: themeColors.text }]}>
+            Save Changes
+          </Text>
+        )}
+      </Pressable>
 
-<Pressable
-  style={[
-    styles.button,
-    {
-      backgroundColor: themeColors.tint,
-      opacity: 1,
-    },
-  ]}
-  onPress={() => router.replace("../profile/changepassword")}
->
-  <Text style={[styles.buttonText, { color: themeColors.btext }]}>
-    Change Password
-  </Text>
-</Pressable>
+      <Pressable
+        style={[
+          styles.button,
+          {
+            backgroundColor: themeColors.tint,
+            opacity: 1,
+          },
+        ]}
+        onPress={() => router.replace("../profile/changepassword")}
+      >
+        <Text style={[styles.buttonText, { color: themeColors.btext }]}>
+          Change Password
+        </Text>
+      </Pressable>
 
-{/* Delete Account Button */}
-<Pressable
-  style={[
-    styles.button,
-    {
-      backgroundColor: "#f44336",
-      opacity: deleting ? 0.6 : 1,
-    },
-  ]}
-  onPress={handleDeleteAccount}
-  disabled={deleting}
->
-  {deleting ? (
-    <ActivityIndicator color="#fff" />
-  ) : (
-    <Text style={styles.buttonText}>
-      Delete Account
-    </Text>
-  )}
-</Pressable>
+      {/* Delete Account Button */}
+      <Pressable
+        style={[
+          styles.button,
+          {
+            backgroundColor: "#f44336",
+            opacity: deleting ? 0.6 : 1,
+          },
+        ]}
+        onPress={handleDeleteAccount}
+        disabled={deleting}
+      >
+        {deleting ? (
+          <ActivityIndicator color="#fff" />
+        ) : (
+          <Text style={styles.buttonText}>Delete Account</Text>
+        )}
+      </Pressable>
     </View>
   );
 }
@@ -394,4 +418,15 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 2,
   },
+  topBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingBottom: 10,
+    paddingHorizontal: 10,
+  },
+  backButton: {
+    padding: 6,
+    paddingBottom:20,
+  },
+  
 });

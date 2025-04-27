@@ -70,7 +70,7 @@ export default function SellScreen() {
       const cat1Snap = await getDocs(collection(db, "product_cat1"));
       const cat2Snap = await getDocs(collection(db, "product_cat2"));
       setCat1Items(
-        cat1Snap.docs.map((doc) => ({ label: doc.data().label, value: doc.id }))
+        cat1Snap.docs.map((doc) => ({ label: doc.data().label, value: doc.data().id }))
       );
       setAllCat2Items(
         cat2Snap.docs.map((doc) => ({
@@ -244,10 +244,13 @@ export default function SellScreen() {
         (item) => item.parentCat1Id === cat1Value
       );
       setCat2Items(filtered);
+      setCat2Value(null); // ✅ Reset subcategory when changing category
     } else {
       setCat2Items([]);
+      setCat2Value(null); // ✅ Reset subcategory if no category
     }
   }, [cat1Value]);
+  
 
   if (loading)
     return (

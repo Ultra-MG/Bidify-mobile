@@ -35,6 +35,7 @@ export default function Register() {
         type: 'error',
         text1: 'All fields are required.',
       });
+      setSubmitting(false);
       return;
     }
     if (password.length < 8) {
@@ -42,6 +43,7 @@ export default function Register() {
         type: 'error',
         text1: 'Password must be at least 8 characters long.',
       });
+      setSubmitting(false);
       return;
     }
     if (!/[A-Z]/.test(password)) {
@@ -49,6 +51,7 @@ export default function Register() {
         type: 'error',
         text1: 'Password must contain at least one uppercase letter.',
       });
+      setSubmitting(false);
       return;
     }
     if (!/[a-z]/.test(password)) {
@@ -56,6 +59,7 @@ export default function Register() {
         type: 'error',
         text1: 'Password must contain at least one lowercase letter.',
       });
+      setSubmitting(false);
       return;
     }
     if (!/[0-9]/.test(password)) {
@@ -63,6 +67,7 @@ export default function Register() {
         type: 'error',
         text1: 'Password must contain at least one number.',
       });
+      setSubmitting(false);
       return;
     }
     if (!/[!@#$%^&*/\\]/.test(password)) {
@@ -70,6 +75,7 @@ export default function Register() {
         type: 'error',
         text1: 'Password must contain at least one special character (!@#$%^&*).',
       });
+      setSubmitting(false);
       return;
     }
 

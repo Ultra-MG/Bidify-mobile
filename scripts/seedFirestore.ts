@@ -3,54 +3,54 @@ import { db, auth } from "../firebaseConfig"; // Adjust path if needed
 
 export async function seedDatabase() {
   try {
-    // 1. Main Categories
-    const categories = [
-      { id: "vehicles", label: "Vehicles" },
-      { id: "properties", label: "Properties" },
-      { id: "electronics", label: "Electronics" },
-      { id: "furniture", label: "Furniture" },
-      { id: "sports", label: "Sports & Equipment" },
-      { id: "fashion", label: "Fashion & Beauty" },
-      { id: "hobbies", label: "Hobbies" },
-    ];
+    // // 1. Main Categories
+    // const categories = [
+    //   { id: "vehicles", label: "Vehicles" },
+    //   { id: "properties", label: "Properties" },
+    //   { id: "electronics", label: "Electronics" },
+    //   { id: "furniture", label: "Furniture" },
+    //   { id: "sports", label: "Sports & Equipment" },
+    //   { id: "fashion", label: "Fashion & Beauty" },
+    //   { id: "hobbies", label: "Hobbies" },
+    // ];
 
-    for (const cat of categories) {
-      await addDoc(collection(db, "product_cat1"), cat);
-    }
+    // for (const cat of categories) {
+    //   await addDoc(collection(db, "product_cat1"), cat);
+    // }
 
-    console.log("✅ Main categories seeded.");
+    // console.log("✅ Main categories seeded.");
 
-    // 2. Subcategories
-    const subcategories = [
-      { id: "cars", label: "Cars", parentCat1Id: "vehicles" },
-      { id: "motorcycles", label: "Motorcycles", parentCat1Id: "vehicles" },
-      { id: "trucks", label: "Trucks", parentCat1Id: "vehicles" },
-      { id: "apartments", label: "Apartments", parentCat1Id: "properties" },
-      { id: "houses", label: "Houses", parentCat1Id: "properties" },
-      { id: "offices", label: "Offices", parentCat1Id: "properties" },
-      { id: "smartphones", label: "Smartphones", parentCat1Id: "electronics" },
-      { id: "laptops", label: "Laptops", parentCat1Id: "electronics" },
-      { id: "tvs", label: "Televisions", parentCat1Id: "electronics" },
-      { id: "sofas", label: "Sofas", parentCat1Id: "furniture" },
-      { id: "tables", label: "Tables", parentCat1Id: "furniture" },
-      { id: "beds", label: "Beds", parentCat1Id: "furniture" },
-      { id: "bicycles", label: "Bicycles", parentCat1Id: "sports" },
-      { id: "gym_equipment", label: "Gym Equipment", parentCat1Id: "sports" },
-      { id: "clothing", label: "Clothing", parentCat1Id: "fashion" },
-      { id: "jewelry", label: "Jewelry", parentCat1Id: "fashion" },
-      { id: "books", label: "Books", parentCat1Id: "hobbies" },
-      { id: "musical_instruments", label: "Musical Instruments", parentCat1Id: "hobbies" },
-    ];
+    // // 2. Subcategories
+    // const subcategories = [
+    //   { id: "cars", label: "Cars", parentCat1Id: "vehicles" },
+    //   { id: "motorcycles", label: "Motorcycles", parentCat1Id: "vehicles" },
+    //   { id: "trucks", label: "Trucks", parentCat1Id: "vehicles" },
+    //   { id: "apartments", label: "Apartments", parentCat1Id: "properties" },
+    //   { id: "houses", label: "Houses", parentCat1Id: "properties" },
+    //   { id: "offices", label: "Offices", parentCat1Id: "properties" },
+    //   { id: "smartphones", label: "Smartphones", parentCat1Id: "electronics" },
+    //   { id: "laptops", label: "Laptops", parentCat1Id: "electronics" },
+    //   { id: "tvs", label: "Televisions", parentCat1Id: "electronics" },
+    //   { id: "sofas", label: "Sofas", parentCat1Id: "furniture" },
+    //   { id: "tables", label: "Tables", parentCat1Id: "furniture" },
+    //   { id: "beds", label: "Beds", parentCat1Id: "furniture" },
+    //   { id: "bicycles", label: "Bicycles", parentCat1Id: "sports" },
+    //   { id: "gym_equipment", label: "Gym Equipment", parentCat1Id: "sports" },
+    //   { id: "clothing", label: "Clothing", parentCat1Id: "fashion" },
+    //   { id: "jewelry", label: "Jewelry", parentCat1Id: "fashion" },
+    //   { id: "books", label: "Books", parentCat1Id: "hobbies" },
+    //   { id: "musical_instruments", label: "Musical Instruments", parentCat1Id: "hobbies" },
+    // ];
 
-    for (const subcat of subcategories) {
-      await addDoc(collection(db, "product_cat2"), subcat);
-    }
+    // for (const subcat of subcategories) {
+    //   await addDoc(collection(db, "product_cat2"), subcat);
+    // }
 
-    console.log("✅ Subcategories seeded.");
+    // console.log("✅ Subcategories seeded.");
 
-    // 3. Products (20 Examples)
-    const now = new Date();
-    const userId = auth.currentUser?.uid || "dummyUserId";
+    // // 3. Products (20 Examples)
+    // const now = new Date();
+    // const userId = auth.currentUser?.uid || "dummyUserId";
 
     const products = [
       {
@@ -96,7 +96,7 @@ export async function seedDatabase() {
         userId: "testUserId"
       },
       {
-        name: "Luxury Apartment",
+        name: "Luxury Apartment 2",
         description: "Modern apartment with city views and amenities.",
         cat1Id: "properties",
         cat2Id: "apartments",
@@ -105,12 +105,12 @@ export async function seedDatabase() {
         photos: ["https://tse2.mm.bing.net/th/id/OIP.xRCrrM2gdEhA4oHAdYhieQHaEl?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() +  2 * 60 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
       {
-        name: "Villa with Pool",
+        name: "Villa 2",
         description: "Beautiful villa with private swimming pool.",
         cat1Id: "properties",
         cat2Id: "houses",
@@ -119,7 +119,7 @@ export async function seedDatabase() {
         photos: ["https://th.bing.com/th/id/OIP.Ypn9qS3FE4lZWiROCy2JKgHaE8?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -133,7 +133,7 @@ export async function seedDatabase() {
         photos: ["https://tse2.mm.bing.net/th/id/OIP.ELbR1Tfjoe1l5mbkHSj9LAAAAA?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 3 * 24 * 60 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -147,7 +147,7 @@ export async function seedDatabase() {
         photos: ["https://tse1.mm.bing.net/th/id/OIP.2plVVz8Zx17dPURqktDqpwHaGS?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 4 * 20 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -161,7 +161,7 @@ export async function seedDatabase() {
         photos: ["https://th.bing.com/th/id/OIP.Y9tUX5s3zlLqHF5wR2YDNQHaEK?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 2 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -174,8 +174,8 @@ export async function seedDatabase() {
         location: "40.7128,-74.0060",
         photos: ["https://tse3.mm.bing.net/th/id/OIP.9YXkghu6iDMlTchKfJ7u0wHaEv?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() + 20 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 25 * 24 * 60 * 30 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -188,8 +188,8 @@ export async function seedDatabase() {
         location: "37.7749,-122.4194", // San Francisco
         photos: ["https://th.bing.com/th/id/OIP.iJA0ukhjHpj-INPJes4VhgHaEW?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 15 * 24 * 60 * 6 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -202,8 +202,8 @@ export async function seedDatabase() {
         location: "33.7490,-84.3880", // Atlanta
         photos: ["https://tse2.mm.bing.net/th/id/OIP.HD2WgJbN3-jEmKTQ0njH0wHaHa?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() + 8 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 25 * 24 * 60 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -216,8 +216,8 @@ export async function seedDatabase() {
         location: "45.5017,-73.5673", // Montreal
         photos: ["https://tse2.mm.bing.net/th/id/OIP.QLMkQqyyACJesZ8_73UfCgHaIJ?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 10 * 24 * 6 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -230,8 +230,8 @@ export async function seedDatabase() {
         location: "34.0522,-118.2437", // LA
         photos: ["https://tse1.mm.bing.net/th/id/OIP.tNjJmP4yN6785zOVKcrN5gHaFj?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 9 * 2 * 20 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -244,8 +244,8 @@ export async function seedDatabase() {
         location: "25.276987,55.296249", // Dubai
         photos: ["https://tse1.mm.bing.net/th/id/OIP.wkuGm9kGaJUvdMLuIAhV7wHaHa?w=1000&h=1000&rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() - 8 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() - 7 * 24 * 10 * 10 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -258,8 +258,8 @@ export async function seedDatabase() {
         location: "40.7128,-74.0060", // NYC
         photos: ["https://tse3.mm.bing.net/th/id/OIP.KGqo2PuqzCRxaPUhWDlAUQHaMW?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() - 20 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() - 7 * 24 * 10 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -272,8 +272,8 @@ export async function seedDatabase() {
         location: "51.1657,10.4515", // Germany
         photos: ["https://th.bing.com/th/id/OIP.mRWz5rGEom41sEakslMJzAHaFj?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() - 10 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() - 5 * 2 * 60 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -286,8 +286,8 @@ export async function seedDatabase() {
         location: "48.8566,2.3522", // Paris
         photos: ["https://tse4.mm.bing.net/th/id/OIP.2k53EVac1kiCCe0UVJ0dIQHaD3?rs=1&pid=ImgDetMain"],
         status: "active",
-        startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        startTime: Timestamp.fromDate(new Date(Date.now() -32 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() -23 * 24 * 10 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -301,7 +301,7 @@ export async function seedDatabase() {
         photos: ["https://th.bing.com/th/id/OIP.xSxSkKqiXCoiU3CqzrVjvwHaHa?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 30 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -315,7 +315,7 @@ export async function seedDatabase() {
         photos: ["https://tse2.mm.bing.net/th/id/OIP.gTmX3XWaiX28ZUR14n5l4wHaEK?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 6 * 60 * 1000)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       },
@@ -329,7 +329,7 @@ export async function seedDatabase() {
         photos: ["https://tse4.mm.bing.net/th/id/OIP.KGCmS_zgqLnFNP8Fy2PjuAHaEx?rs=1&pid=ImgDetMain"],
         status: "active",
         startTime: Timestamp.fromDate(new Date()),
-        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)),
+        endTime: Timestamp.fromDate(new Date(Date.now() + 7 * 24 * 60 * 60 * 100)),
         createdAt: Timestamp.now(),
         userId: "testUserId"
       }]
@@ -343,20 +343,20 @@ export async function seedDatabase() {
           console.error(`🚫 Product "${p.name}" has no photos. Skipping.`);
           continue;  // skip
         }
-      await addDoc(collection(db, "products"), {
-        name: p.name,
-        description: p.description,
-        location: p.location,
-        price: p.price,
-        photos: p.photos,
-        startTime: p.startTime,
-        endTime: p.endTime,
-        cat1Id: p.cat1Id,
-        cat2Id: p.cat2Id,
-        status: p.status,
-        createdAt: p.createdAt,
-        userId : p.userId,
-      });
+        await addDoc(collection(db, "products"), {
+          name: p.name,
+          description: p.description,
+          location: p.location, // Should still be like "33.1234,35.5678"
+          photos: p.photos,      // ✅ Array of image URLs (not local uris)
+          startPrice: p.price, // 🚀 Correct field name! Use `startPrice` not `price`
+          startTime: p.startTime instanceof Date ? Timestamp.fromDate(p.startTime) : p.startTime,
+          endTime: p.endTime instanceof Date ? Timestamp.fromDate(p.endTime) : p.endTime,
+          cat1Id: p.cat1Id,
+          cat2Id: p.cat2Id,
+          status: p.status || "active", // ✅ Default status if missing
+          createdAt: p.createdAt || Timestamp.now(), // ✅ Fallback to now
+          userId: p.userId,
+        });        
     }
 
     console.log("✅ 20 example products seeded!");
@@ -366,4 +366,4 @@ export async function seedDatabase() {
   }
 }
 
-seedDatabase();
+// seedDatabase();

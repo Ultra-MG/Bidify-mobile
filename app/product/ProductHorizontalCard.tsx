@@ -12,6 +12,7 @@ import { useTheme } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
 import { useFocusEffect } from 'expo-router';
 import * as Notifications from 'expo-notifications';
+import { SchedulableTriggerInputTypes } from "expo-notifications";
 import Toast from 'react-native-toast-message';
 import {
   collection,
@@ -109,27 +110,37 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
         if (product.startTime) {
           const startDate = fixDate(product.startTime);
           const now = new Date();
-  
           const secondsUntilStart = Math.floor((startDate.getTime() - now.getTime()) / 1000);
-  
+      
+          console.log("🛠️ Product Start Time:", product.startTime);
+          console.log("🛠️ Fixed Start Date:", startDate.toISOString());
+          console.log("🛠️ Now:", now.toISOString());
+          console.log("🛠️ Seconds until start:", secondsUntilStart);
+      
           if (secondsUntilStart > 0) {
             notificationId = await Notifications.scheduleNotificationAsync({
               content: {
-                title: "Auction Started!",
-                body: `The auction for "${product.name}" is now live.`,
+                title: "Auction Started! 🚀",
+                body: `The auction for "${product.name}" has just started!`,
                 data: { productId: product.id },
               },
               trigger: {
+                type: SchedulableTriggerInputTypes.TIME_INTERVAL,
                 seconds: secondsUntilStart,
                 repeats: false,
-              } as Notifications.TimeIntervalTriggerInput,
+              },
             });
+            console.log('✅ Scheduled notification with ID:', notificationId);
+          } else {
+            console.log('⚠️ Not scheduling because secondsUntilStart <= 0');
           }
+        } else {
+          console.log('⚠️ No startTime available');
         }
-
       } catch (error) {
-        console.error("Failed to schedule notification:", error);
+        console.error("❌ Failed to schedule notification:", error);
       }
+      
   
       await addDoc(cartRef, {
         userId: user.uid,

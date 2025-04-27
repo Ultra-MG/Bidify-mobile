@@ -126,7 +126,6 @@ export default function HomeScreen() {
       router.push(`/product/products?search=${encodeURIComponent(term)}`);
     }
   };
-  
 
   useEffect(() => {
     fetchRecommended();
@@ -189,7 +188,7 @@ export default function HomeScreen() {
       },
       trigger: {
         type: SchedulableTriggerInputTypes.TIME_INTERVAL,
-        seconds:14 * 60 * 60,
+        seconds: 14 * 60 * 60,
         repeats: false,
       },
     });
@@ -239,11 +238,16 @@ export default function HomeScreen() {
       >
         {}
         <View style={styles.topBar}>
-          <Ionicons
-            name="notifications-outline"
-            size={24}
-            color={themeColors.tint}
-          />
+          <Pressable
+            onPress={() => router.push("/notifications/notifications")}
+          >
+            <Ionicons
+              name="notifications-outline"
+              size={24}
+              color={themeColors.tint}
+            />
+          </Pressable>
+
           <Text style={[styles.storeName, { color: themeColors.text }]}>
             Bidify
           </Text>
@@ -253,89 +257,89 @@ export default function HomeScreen() {
         </View>
 
         <View style={{ position: "relative" }}>
-  <View
-    style={[
-      styles.header,
-      {
-        backgroundColor: themeColors.cardBackground,
-        borderColor: themeColors.cardBorder,
-        borderWidth: 1,
-      },
-    ]}
-  >
-    <TextInput
-      ref={searchInputRef}
-      style={[styles.searchInput, { color: themeColors.text }]}
-      placeholder="What are you looking for?"
-      placeholderTextColor={themeColors.icon}
-      value={search}
-      onChangeText={setSearch}
-      onSubmitEditing={() => handleSearch()}
-      onFocus={() => setSearchFocused(true)}
-      onBlur={() => setSearchFocused(false)}
-      returnKeyType="search"
-    />
-  </View>
-
-  {searchFocused && searchHistory.length > 0 && (
-    <View
-      style={{
-        position: "absolute",
-        top: '100%',
-        left: 0,  // notice changed to 0, since it's same container
-        right: 0,
-        zIndex: 999,
-        backgroundColor: themeColors.cardBackground,
-        borderColor: themeColors.cardBorder,
-        borderWidth: 1,
-        borderRadius: 8,
-        overflow: "hidden",
-        maxHeight: 400,
-      }}
-    >
-      <ScrollView keyboardShouldPersistTaps="handled">
-        {searchHistory.map((item, index) => (
-          <Pressable
-            key={index}
-            onPress={() => {
-              const cleanItem = item.trim();
-              if (cleanItem) {
-                setSearch(cleanItem);
-                setSearchFocused(false);
-               
-                setTimeout(() => {
-                  handleSearch(cleanItem);
-                }, 50); 
-              }
-            }}
-            style={{
-              paddingVertical: 12,
-              paddingHorizontal: 14,
-              borderBottomWidth: index !== searchHistory.length - 1 ? 1 : 0,
-              borderBottomColor: themeColors.cardBorder,
-            }}
+          <View
+            style={[
+              styles.header,
+              {
+                backgroundColor: themeColors.cardBackground,
+                borderColor: themeColors.cardBorder,
+                borderWidth: 1,
+              },
+            ]}
           >
-            <Text style={{ color: themeColors.text }}>{item}</Text>
-          </Pressable>
-        ))}
-      </ScrollView>
+            <TextInput
+              ref={searchInputRef}
+              style={[styles.searchInput, { color: themeColors.text }]}
+              placeholder="What are you looking for?"
+              placeholderTextColor={themeColors.icon}
+              value={search}
+              onChangeText={setSearch}
+              onSubmitEditing={() => handleSearch()}
+              onFocus={() => setSearchFocused(true)}
+              onBlur={() => setSearchFocused(false)}
+              returnKeyType="search"
+            />
+          </View>
 
-      <Pressable
-        onPress={clearSearchHistory}
-        style={{
-          paddingVertical: 12,
-          alignItems: "center",
-          backgroundColor: "red",
-        }}
-      >
-        <Text style={{ color: "white", fontWeight: "600" }}>
-          Clear History
-        </Text>
-      </Pressable>
-    </View>
-  )}
-</View>
+          {searchFocused && searchHistory.length > 0 && (
+            <View
+              style={{
+                position: "absolute",
+                top: "100%",
+                left: 0, // notice changed to 0, since it's same container
+                right: 0,
+                zIndex: 999,
+                backgroundColor: themeColors.cardBackground,
+                borderColor: themeColors.cardBorder,
+                borderWidth: 1,
+                borderRadius: 8,
+                overflow: "hidden",
+                maxHeight: 400,
+              }}
+            >
+              <ScrollView keyboardShouldPersistTaps="handled">
+                {searchHistory.map((item, index) => (
+                  <Pressable
+                    key={index}
+                    onPress={() => {
+                      const cleanItem = item.trim();
+                      if (cleanItem) {
+                        setSearch(cleanItem);
+                        setSearchFocused(false);
 
+                        setTimeout(() => {
+                          handleSearch(cleanItem);
+                        }, 50);
+                      }
+                    }}
+                    style={{
+                      paddingVertical: 12,
+                      paddingHorizontal: 14,
+                      borderBottomWidth:
+                        index !== searchHistory.length - 1 ? 1 : 0,
+                      borderBottomColor: themeColors.cardBorder,
+                    }}
+                  >
+                    <Text style={{ color: themeColors.text }}>{item}</Text>
+                  </Pressable>
+                ))}
+              </ScrollView>
+
+              <Pressable
+                onPress={clearSearchHistory}
+                style={{
+                  paddingVertical: 12,
+                  alignItems: "center",
+                  backgroundColor: "red",
+                }}
+              >
+                <Text style={{ color: "white", fontWeight: "600" }}>
+                  Clear History
+                </Text>
+              </Pressable>
+            </View>
+          )}
+        </View>
 
         {}
         <FlatList

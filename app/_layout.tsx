@@ -9,11 +9,31 @@ import {  Image } from 'react-native';
 import Toast from 'react-native-toast-message';
 import CustomToast from '../components/CustomToast';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 export default function RootLayout() {
   const [user, setUser] = useState<null | object | undefined>(undefined);
   const [showSplash, setShowSplash] = useState(true);
 
 
+  Notifications.setNotificationHandler({
+    handleNotification: async (notification) => {
+      // Save it here...
+      return {
+        shouldShowAlert: true,
+        shouldPlaySound: true,
+        shouldSetBadge: true,
+      };
+    },
+  });
+  
+  // Inside RootLayout -> useEffect for foreground
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(async (notification) => {
+      // Save it + Toast here...
+    });
+  
+    return () => subscription.remove();
+  }, []);
 
   useEffect(() => {
     const splashTimeout = setTimeout(() => {
@@ -28,19 +48,40 @@ export default function RootLayout() {
     return unsubscribe;
   }, []);
   useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(notification => {
+    const subscription = Notifications.addNotificationReceivedListener(async (notification) => {
       const title = notification.request.content.title;
       const body = notification.request.content.body;
-
+      const timestamp = new Date().toISOString();
+  
+      // Save the notification locally
+      try {
+        const existing = await AsyncStorage.getItem('saved_notifications');
+        const notifications = existing ? JSON.parse(existing) : [];
+  
+        const newNotification = {
+          title: title || "Notification",
+          body: body || "",
+          timestamp,
+        };
+  
+        notifications.push(newNotification);
+  
+        await AsyncStorage.setItem('saved_notifications', JSON.stringify(notifications));
+        console.log('✅ Notification saved to storage');
+      } catch (error) {
+        console.error('❌ Failed to save notification:', error);
+      }
+  
+      // Still show it as a Toast
       Toast.show({
-        type: 'info', // or 'success', 'error'
+        type: 'info',
         text1: title || 'Notification',
         text2: body || '',
         position: 'top',
-        visibilityTime: 4000, // how long the toast shows
+        visibilityTime: 4000,
       });
     });
-
+  
     return () => subscription.remove();
   }, []);
   if (showSplash) {
