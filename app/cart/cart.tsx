@@ -108,8 +108,7 @@ export default function CartScreen() {
         columnWrapperStyle={{ justifyContent: "space-between" }}
         renderItem={({ item }) => (
           <CartEndedProductCard product={item} />
-        )}
-               
+        )}              
       />
     </View>
   );

@@ -118,11 +118,11 @@ export default function Login() {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity onPress={() => router.push("/admin")}>
+      {/* <TouchableOpacity onPress={() => router.push("/admin")}>
         <Text style={{ color: themeColors.tint, marginTop: 16 }}>
           Open Admin
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }

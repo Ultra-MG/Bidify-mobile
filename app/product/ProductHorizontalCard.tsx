@@ -10,10 +10,8 @@ import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { useTheme } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
-import { useFocusEffect } from 'expo-router';
-import * as Notifications from 'expo-notifications';
+import * as Notifications from "expo-notifications";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
-import Toast from 'react-native-toast-message';
 import {
   collection,
   query,
@@ -28,7 +26,6 @@ import {
 } from "firebase/firestore";
 import { db } from "../../firebaseConfig";
 import { auth } from "../../firebaseConfig";
-import { DateTriggerInput } from 'expo-notifications';
 export default function ProductHorizontalCard({ product }: { product: any }) {
   const router = useRouter();
   const { theme } = useTheme();
@@ -43,80 +40,54 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
   );
 
   useEffect(() => {
-    const init = async () => {
-      await checkIfInCart();
-      updateTimeLabel();
-  
-      const interval = setInterval(updateTimeLabel, 60000);
-  
-      const bidsQuery = query(
-        collection(db, "bids"),
-        where("productId", "==", product.id),
-        orderBy("bidAmount", "desc"),
-        limit(1)
-      );
-  
-      const unsubscribe = onSnapshot(bidsQuery, (snapshot) => {
-        if (!snapshot.empty) {
-          const topBid = snapshot.docs[0].data();
-          setCurrentHighestBid(topBid.bidAmount);
-        }
-      });
-  
-      return () => {
-        clearInterval(interval);
-        unsubscribe();
-      };
-    };
-  
-    init();
-  }, [product.id]);
-  
-  
+    if (!auth.currentUser) return;
 
-  
-  
-  const checkIfInCart = async () => {
     const user = auth.currentUser;
-    if (!user) return;
 
-    const q = query(
+    const cartQuery = query(
       collection(db, "cart"),
       where("userId", "==", user.uid),
       where("productId", "==", product.id)
     );
 
-    const snapshot = await getDocs(q);
-    setInCart(!snapshot.empty);
-  };
+    const unsubscribe = onSnapshot(cartQuery, (snapshot) => {
+      setInCart(!snapshot.empty);
+    });
 
+    updateTimeLabel();
+
+    const interval = setInterval(updateTimeLabel, 60000);
+
+    return () => {
+      unsubscribe();
+      clearInterval(interval);
+    };
+  }, [product.id]);
 
   const handleToggleCart = async () => {
     const user = auth.currentUser;
     if (!user) return;
-  
+
     const cartRef = collection(db, "cart");
     const q = query(
       cartRef,
       where("userId", "==", user.uid),
       where("productId", "==", product.id)
     );
+
     const existing = await getDocs(q);
-  
+
     if (existing.empty) {
       let notificationId = "";
-  
+
       try {
         if (product.startTime) {
           const startDate = fixDate(product.startTime);
           const now = new Date();
-          const secondsUntilStart = Math.floor((startDate.getTime() - now.getTime()) / 1000);
-      
-          console.log("🛠️ Product Start Time:", product.startTime);
-          console.log("🛠️ Fixed Start Date:", startDate.toISOString());
-          console.log("🛠️ Now:", now.toISOString());
-          console.log("🛠️ Seconds until start:", secondsUntilStart);
-      
+          const secondsUntilStart = Math.floor(
+            (startDate.getTime() - now.getTime()) / 1000
+          );
+
           if (secondsUntilStart > 0) {
             notificationId = await Notifications.scheduleNotificationAsync({
               content: {
@@ -130,46 +101,33 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
                 repeats: false,
               },
             });
-            console.log('✅ Scheduled notification with ID:', notificationId);
-          } else {
-            console.log('⚠️ Not scheduling because secondsUntilStart <= 0');
+            console.log("✅ Scheduled notification with ID:", notificationId);
           }
-        } else {
-          console.log('⚠️ No startTime available');
         }
       } catch (error) {
         console.error("❌ Failed to schedule notification:", error);
       }
-      
-  
+
       await addDoc(cartRef, {
         userId: user.uid,
         productId: product.id,
         notificationId: notificationId,
         timestamp: new Date(),
       });
-  
-      setInCart(true);
-  
     } else {
-      // 🛑 Cancel previous notification if it exists
       await Promise.all(
         existing.docs.map(async (docSnap) => {
           const cartData = docSnap.data();
           if (cartData.notificationId) {
-            await Notifications.cancelScheduledNotificationAsync(cartData.notificationId);
+            await Notifications.cancelScheduledNotificationAsync(
+              cartData.notificationId
+            );
           }
           await deleteDoc(doc(db, "cart", docSnap.id));
         })
       );
-      setInCart(false);
     }
   };
-  
-  
-  
-  
-  
 
   const getTimeDiffString = (futureDate: Date) => {
     const now = new Date();
@@ -197,7 +155,6 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
     const now = new Date();
     const start = fixDate(product.startTime);
     const end = fixDate(product.endTime);
-
 
     if (now < start) {
       setTimeLabel(`Starts in: ${getTimeDiffString(start)}`);
@@ -233,7 +190,9 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
         </Text>
         <Text style={[styles.price, { color: themeColors.tint }]}>
           {(currentHighestBid ?? product.startPrice) !== undefined
-            ? `USD ${(currentHighestBid ?? product.startPrice).toLocaleString()}`
+            ? `USD ${(
+                currentHighestBid ?? product.startPrice
+              ).toLocaleString()}`
             : "USD N/A"}
         </Text>
         <Text style={[styles.subText, { color: themeColors.icon }]}>

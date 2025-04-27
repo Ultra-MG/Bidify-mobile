@@ -10,6 +10,8 @@ import { useRouter } from "expo-router";
 import { Colors } from "../../constants/Colors";
 import { useTheme } from "../../context/ThemeContext";
 import { useEffect, useState } from "react";
+import * as Notifications from "expo-notifications";
+
 import {
   collection,
   query,
@@ -49,23 +51,40 @@ export default function CartEndedProductCard({ product }: { product: any }) {
     try {
       const user = auth.currentUser;
       if (!user) return;
-
+  
       const q = query(
         collection(db, "cart"),
         where("userId", "==", user.uid),
         where("productId", "==", product.id)
       );
+  
       const snapshot = await getDocs(q);
-
+  
+      // Cancel any scheduled notifications first
+      await Promise.all(
+        snapshot.docs.map(async (docSnap) => {
+          const cartData = docSnap.data();
+          if (cartData.notificationId) {
+            try {
+              await Notifications.cancelScheduledNotificationAsync(cartData.notificationId);
+            } catch (err) {
+              console.error("Failed to cancel notification:", err);
+            }
+          }
+        })
+      );
+  
+      // Then delete the cart entries
       await Promise.all(
         snapshot.docs.map((docSnap) => deleteDoc(doc(db, "cart", docSnap.id)))
       );
-
-      // Optional: You can refresh cart list after remove if needed
+  
+      console.log("✅ Product removed from cart");
     } catch (error) {
-      console.error("Failed to remove from cart:", error);
+      console.error("❌ Failed to remove from cart:", error);
     }
   };
+  
 
   return (
     <TouchableOpacity
@@ -94,24 +113,20 @@ export default function CartEndedProductCard({ product }: { product: any }) {
           {bidEnded ? "Bid Ended" : "Auction Active"}
         </Text>
         <TouchableOpacity
-  onPress={handleRemoveFromCart}
-  style={[
-    styles.removeButton,
-    { 
-      backgroundColor: themeColors.background,
-      borderColor: themeColors.tint,
-      borderWidth: 1, // ✅ Add this
-    },
-  ]}
->
-  <Text style={[
-    styles.removeButtonText,
-    { color: themeColors.tint }
-  ]}>
-    Remove from Cart
-  </Text>
-</TouchableOpacity>
-
+          onPress={handleRemoveFromCart}
+          style={[
+            styles.removeButton,
+            {
+              backgroundColor: themeColors.background,
+              borderColor: themeColors.tint,
+              borderWidth: 1, // ✅ Add this
+            },
+          ]}
+        >
+          <Text style={[styles.removeButtonText, { color: themeColors.tint }]}>
+            Remove from Cart
+          </Text>
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );

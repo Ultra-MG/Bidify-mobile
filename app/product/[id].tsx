@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as Notifications from "expo-notifications";
+import { SchedulableTriggerInputTypes } from "expo-notifications";
 import {
   View,
   Text,
@@ -347,6 +349,12 @@ setCat2List(subcategories);
       </View>
     );
   }
+  const fixDate = (input: any) => {
+    if (!input) return new Date();
+    if (input.seconds) return new Date(input.seconds * 1000);
+    if (input.toDate) return input.toDate();
+    return new Date(input);
+  };
   const handleToggleCart = async () => {
     const user = auth.currentUser;
     if (!user) return;
@@ -360,15 +368,60 @@ setCat2List(subcategories);
     const existing = await getDocs(q);
 
     if (existing.empty) {
+      let notificationId = "";
+
+      try {
+        if (product.startTime) {
+          const startDate = fixDate(product.startTime);
+          const now = new Date();
+          const secondsUntilStart = Math.floor(
+            (startDate.getTime() - now.getTime()) / 1000
+          );
+
+          if (secondsUntilStart > 0) {
+            notificationId = await Notifications.scheduleNotificationAsync({
+              content: {
+                title: "Auction Started! 🚀",
+                body: `The auction for "${product.name}" has just started!`,
+                data: { productId: product.id },
+              },
+              trigger: {
+                type: SchedulableTriggerInputTypes.TIME_INTERVAL,
+                seconds: secondsUntilStart,
+                repeats: false,
+              },
+            });
+            console.log("✅ Scheduled notification with ID:", notificationId);
+          } else {
+            console.log("⚠️ Not scheduling because secondsUntilStart <= 0");
+          }
+        } else {
+          console.log("⚠️ No startTime available");
+        }
+      } catch (error) {
+        console.error("❌ Failed to schedule notification:", error);
+      }
+
       await addDoc(cartRef, {
         userId: user.uid,
         productId: product.id,
+        notificationId: notificationId,
         timestamp: new Date(),
       });
+
       setInCart(true);
     } else {
+      // 🛑 Cancel previous notification if it exists
       await Promise.all(
-        existing.docs.map((docSnap) => deleteDoc(doc(db, "cart", docSnap.id)))
+        existing.docs.map(async (docSnap) => {
+          const cartData = docSnap.data();
+          if (cartData.notificationId) {
+            await Notifications.cancelScheduledNotificationAsync(
+              cartData.notificationId
+            );
+          }
+          await deleteDoc(doc(db, "cart", docSnap.id));
+        })
       );
       setInCart(false);
     }

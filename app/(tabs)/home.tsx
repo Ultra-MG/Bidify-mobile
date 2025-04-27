@@ -31,7 +31,7 @@ const categories = [
   { name: "Properties", icon: "home" },
   { name: "Electronics", icon: "tv" },
   { name: "Furniture", icon: "bed" },
-  { name: "Sports & Equipment", icon: "football" },
+  { name: "Sports", icon: "football" },
   { name: "Fashion", icon: "shirt" },
   { name: "Hobbies", icon: "game-controller" },
 ];

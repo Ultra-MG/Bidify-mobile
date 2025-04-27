@@ -280,7 +280,8 @@ export default function ProductListScreen() {
                                 borderBottomColor: themeColors.cardBorder,
                               },
                               selectedCat1 === cat.id && {
-                                backgroundColor: themeColors.buttonBackground,
+                                backgroundColor:
+                                themeColors.cardBackground,
                               },
                             ]}
                           >
