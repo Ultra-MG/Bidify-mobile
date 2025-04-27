@@ -48,6 +48,8 @@ export default function ProductDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [startCountdown, setStartCountdown] = useState("");
   const [inCart, setInCart] = useState(false);
+  const [cat2List, setCat2List] = useState<any[]>([]);
+
   const openLocation = (latitude: number, longitude: number) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
     Linking.openURL(url);
@@ -100,6 +102,13 @@ export default function ProductDetail() {
       latitude,
       longitude,
     });
+    const cat2Snap = await getDocs(collection(db, "product_cat2"));
+const subcategories = cat2Snap.docs.map((doc) => ({
+  id: doc.id,
+  label: doc.data().label,
+}));
+setCat2List(subcategories);
+
     await checkIfInCart({ ...productData, id: snap.id });
     updateAuctionState(productData); 
     setLoading(false);
@@ -126,6 +135,9 @@ export default function ProductDetail() {
     setInCart(!snapshot.empty);
   };
   
+  const getCat2Label = () => {
+    return cat2List.find((c) => c.id === product.cat2Id)?.label || product.cat2Id;
+  };
   
   const updateAuctionState = (productData: any) => {
     const now = new Date();
@@ -428,7 +440,7 @@ export default function ProductDetail() {
           <Text style={[styles.description, { color: themeColors.icon }]}>{product.description}</Text>
   
           {/* Category */}
-          <Text style={[styles.meta, { color: themeColors.icon }]}>📦 Category: {product.cat1Id} / {product.cat2Id}</Text>
+          <Text style={[styles.meta, { color: themeColors.icon }]}>📦 Category: {product.cat1Id} / {getCat2Label()}</Text>
   
           {/* Bid Section */}
           {auctionState === "running" && (

@@ -32,7 +32,7 @@ const categories = [
   { name: "Electronics", icon: "tv" },
   { name: "Furniture", icon: "bed" },
   { name: "Sports & Equipment", icon: "football" },
-  { name: "Fashion & Beauty", icon: "shirt" },
+  { name: "Fashion", icon: "shirt" },
   { name: "Hobbies", icon: "game-controller" },
 ];
 
@@ -366,9 +366,8 @@ export default function HomeScreen() {
                       },
                     ]}
                     onPress={() =>
-                      router.push(
-                        `/product/products?cat1Id=${cat.name.toLowerCase()}`
-                      )
+                      router.push(`/product/products?cat1Id=${encodeURIComponent(cat.name.toLowerCase())}`)
+
                     }
                   >
                     <Ionicons

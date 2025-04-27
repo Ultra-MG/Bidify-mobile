@@ -107,10 +107,9 @@ export default function CartScreen() {
         keyExtractor={(item) => item.id}
         columnWrapperStyle={{ justifyContent: "space-between" }}
         renderItem={({ item }) => (
-          item.ended
-            ? <CartEndedProductCard product={item} />
-            : <ProductHorizontalCard product={item} />
-        )}        
+          <CartEndedProductCard product={item} />
+        )}
+               
       />
     </View>
   );

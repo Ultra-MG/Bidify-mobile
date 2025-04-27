@@ -94,11 +94,24 @@ export default function CartEndedProductCard({ product }: { product: any }) {
           {bidEnded ? "Bid Ended" : "Auction Active"}
         </Text>
         <TouchableOpacity
-          onPress={handleRemoveFromCart}
-          style={[styles.removeButton, { backgroundColor: themeColors.tint }]}
-        >
-          <Text style={styles.removeButtonText}>Remove from Cart</Text>
-        </TouchableOpacity>
+  onPress={handleRemoveFromCart}
+  style={[
+    styles.removeButton,
+    { 
+      backgroundColor: themeColors.background,
+      borderColor: themeColors.tint,
+      borderWidth: 1, // ✅ Add this
+    },
+  ]}
+>
+  <Text style={[
+    styles.removeButtonText,
+    { color: themeColors.tint }
+  ]}>
+    Remove from Cart
+  </Text>
+</TouchableOpacity>
+
       </View>
     </TouchableOpacity>
   );

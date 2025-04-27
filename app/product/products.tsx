@@ -37,11 +37,6 @@ export default function ProductListScreen() {
   const [filteredProducts, setFilteredProducts] = useState<any[]>([]);
   const [searchInput, setSearchInput] = useState(searchParam);
   const [loading, setLoading] = useState(true);
-  const categoryButtonRef = useRef<View>(null);
-  const subcategoryButtonRef = useRef<View>(null);
-
-  const [categoryDropdownY, setCategoryDropdownY] = useState(0);
-  const [subcategoryDropdownY, setSubcategoryDropdownY] = useState(0);
 
   const [filterVisible, setFilterVisible] = useState(false);
   const [cat1List, setCat1List] = useState<any[]>([]);
@@ -89,7 +84,10 @@ export default function ProductListScreen() {
     const cat1Snap = await getDocs(collection(db, "product_cat1"));
     const cat2Snap = await getDocs(collection(db, "product_cat2"));
     setCat1List(
-      cat1Snap.docs.map((doc) => ({ id: doc.id, label: doc.data().label }))
+      cat1Snap.docs.map((doc) => ({
+        id: doc.data().id,
+        label: doc.data().label,
+      }))
     );
     setCat2List(
       cat2Snap.docs.map((doc) => ({
@@ -211,205 +209,260 @@ export default function ProductListScreen() {
         columnWrapperStyle={{ justifyContent: "space-between" }}
       />
 
- {/* Filter Panel */}
-<Modal visible={filterVisible} animationType="slide" transparent={true}>
-  <View style={styles.modalOverlay}>
-    <View style={[styles.filterPanel, { backgroundColor: themeColors.cardBackground }]}>
-      <View style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={{ padding: 16 }}>
-          <Text style={[styles.filterTitle, { color: themeColors.text }]}>
-            Filter Products
-          </Text>
-
-          {/* Category Dropdown */}
-          <Text style={[styles.filterLabel, { color: themeColors.icon }]}>
-            Category
-          </Text>
-          <View style={{ position: 'relative' }}>
-          <Pressable
+      {/* Filter Panel */}
+      <Modal visible={filterVisible} animationType="slide" transparent={true}>
+        <View style={styles.modalOverlay}>
+          <View
             style={[
-              styles.dropdownSelect,
-              {
-                borderColor: themeColors.cardBorder,
-                backgroundColor: themeColors.background,
-              },
+              styles.filterPanel,
+              { backgroundColor: themeColors.cardBackground },
             ]}
-            onPress={() => {
-              setCategoryDropdownOpen(prev => !prev);
-              setSubcategoryDropdownOpen(false);
-            }}
           >
-            <Text style={{ color: selectedCat1 ? themeColors.text : themeColors.icon }}>
-              {selectedCat1
-                ? cat1List.find(c => c.id === selectedCat1)?.label || "Select Category"
-                : "Select Category"}
-            </Text>
-          </Pressable>
-
-          {categoryDropdownOpen && (
-            <View style={styles.overlayDropdown}>
-              <ScrollView style={{ maxHeight: 200 }} keyboardShouldPersistTaps="handled">
-                {cat1List.map(cat => (
-                  <Pressable
-                    key={cat.id}
-                    onPress={() => {
-                      setSelectedCat1(cat.id);
-                      setSelectedCat2('');
-                      setCategoryDropdownOpen(false);
-                    }}
-                    style={[
-                      styles.dropdownItem,
-                      selectedCat1 === cat.id && { backgroundColor: themeColors.cardBackground },
-                    ]}
-                  >
-                    <Text style={{ color: themeColors.text }}>{cat.label}</Text>
-                  </Pressable>
-                ))}
-              </ScrollView>
-            </View>
-          )}
-          </View>
-
-          {/* Subcategory Dropdown */}
-          {selectedCat1 && (
-            <>
-              <Text style={[styles.filterLabel, { color: themeColors.icon }]}>
-                Subcategory
-              </Text>
-              <View style={{ position: 'relative' }}>
-              <Pressable
-                style={[
-                  styles.dropdownSelect,
-                  {
-                    borderColor: themeColors.cardBorder,
-                    backgroundColor: themeColors.background,
-                  },
-                ]}
-                onPress={() => {
-                  setSubcategoryDropdownOpen(prev => !prev);
-                  setCategoryDropdownOpen(false);
-                }}
-              >
-                <Text style={{ color: selectedCat2 ? themeColors.text : themeColors.icon }}>
-                  {selectedCat2
-                    ? cat2List.find(c => c.id === selectedCat2)?.label || "Select Subcategory"
-                    : "Select Subcategory"}
+            <View style={{ flex: 1 }}>
+              <ScrollView contentContainerStyle={{ padding: 16 }}>
+                <Text style={[styles.filterTitle, { color: themeColors.text }]}>
+                  Filter Products
                 </Text>
-              </Pressable>
 
-              {subcategoryDropdownOpen && (
-                <View style={styles.overlayDropdown}>
-                  <ScrollView style={{ maxHeight: 200 }} keyboardShouldPersistTaps="handled">
-                    {cat2List
-                      .filter(c => c.parentCat1Id === selectedCat1)
-                      .map(cat => (
-                        <Pressable
-                          key={cat.id}
-                          onPress={() => {
-                            setSelectedCat2(cat.id);
-                            setSubcategoryDropdownOpen(false);
+                {/* Category Dropdown */}
+                <Text style={[styles.filterLabel, { color: themeColors.icon }]}>
+                  Category
+                </Text>
+                <View style={{ position: "relative" }}>
+                  <Pressable
+                    style={[
+                      styles.dropdownSelect,
+                      {
+                        borderColor: themeColors.cardBorder,
+                        backgroundColor: themeColors.background,
+                      },
+                    ]}
+                    onPress={() => {
+                      setCategoryDropdownOpen((prev) => !prev);
+                      setSubcategoryDropdownOpen(false);
+                    }}
+                  >
+                    <Text
+                      style={{
+                        color: selectedCat1
+                          ? themeColors.text
+                          : themeColors.icon,
+                      }}
+                    >
+                      {selectedCat1
+                        ? cat1List.find((c) => c.id === selectedCat1)?.label ||
+                          "Select Category"
+                        : "Select Category"}
+                    </Text>
+                  </Pressable>
+
+                  {categoryDropdownOpen && (
+                    <View style={[styles.overlayDropdown, {
+                      backgroundColor: themeColors.cardBackground,
+                      borderColor: themeColors.cardBorder,
+                    }]}>
+                    
+                      <ScrollView
+                        style={{ maxHeight: 200 }}
+                        keyboardShouldPersistTaps="handled"
+                      >
+                        {cat1List.map((cat) => (
+                          <Pressable
+                            key={cat.id}
+                            onPress={() => {
+                              setSelectedCat1(cat.id);
+                              setSelectedCat2("");
+                              setCategoryDropdownOpen(false);
+                            }}
+                            style={[
+                              styles.dropdownItem,
+                              {
+                                borderBottomColor: themeColors.cardBorder,
+                              },
+                              selectedCat1 === cat.id && {
+                                backgroundColor: themeColors.buttonBackground,
+                              },
+                            ]}
+                          >
+                            <Text style={{ color: themeColors.text }}>
+                              {cat.label}
+                            </Text>
+                          </Pressable>
+                        ))}
+                      </ScrollView>
+                    </View>
+                  )}
+                </View>
+
+                {/* Subcategory Dropdown */}
+                {selectedCat1 && (
+                  <>
+                    <Text
+                      style={[styles.filterLabel, { color: themeColors.icon }]}
+                    >
+                      Subcategory
+                    </Text>
+                    <View style={{ position: "relative" }}>
+                      <Pressable
+                        style={[
+                          styles.dropdownSelect,
+                          {
+                            borderColor: themeColors.cardBorder,
+                            backgroundColor: themeColors.background,
+                          },
+                        ]}
+                        onPress={() => {
+                          setSubcategoryDropdownOpen((prev) => !prev);
+                          setCategoryDropdownOpen(false);
+                        }}
+                      >
+                        <Text
+                          style={{
+                            color: selectedCat2
+                              ? themeColors.text
+                              : themeColors.icon,
                           }}
+                        >
+                          {selectedCat2
+                            ? cat2List.find((c) => c.id === selectedCat2)
+                                ?.label || "Select Subcategory"
+                            : "Select Subcategory"}
+                        </Text>
+                      </Pressable>
+
+                      {subcategoryDropdownOpen && (
+                        <View
                           style={[
-                            styles.dropdownItem,
-                            selectedCat2 === cat.id && { backgroundColor: themeColors.cardBackground },
+                            styles.overlayDropdown,
+                            {
+                              backgroundColor: themeColors.cardBackground,
+                              borderColor: themeColors.cardBorder,
+                            },
                           ]}
                         >
-                          <Text style={{ color: themeColors.text }}>{cat.label}</Text>
-                        </Pressable>
-                      ))}
-                  </ScrollView>
+                          <ScrollView
+                            style={{ maxHeight: 200 }}
+                            keyboardShouldPersistTaps="handled"
+                          >
+                            {cat2List
+                              .filter((c) => c.parentCat1Id === selectedCat1)
+                              .map((cat) => (
+                                <Pressable
+                                  key={cat.id}
+                                  onPress={() => {
+                                    setSelectedCat2(cat.id);
+                                    setSubcategoryDropdownOpen(false);
+                                  }}
+                                  style={[
+                                    styles.dropdownItem,
+                                    {
+                                      borderBottomColor: themeColors.cardBorder,
+                                    },
+                                    selectedCat2 === cat.id && {
+                                      backgroundColor:
+                                        themeColors.cardBackground,
+                                    },
+                                  ]}
+                                >
+                                  <Text style={{ color: themeColors.text }}>
+                                    {cat.label}
+                                  </Text>
+                                </Pressable>
+                              ))}
+                          </ScrollView>
+                        </View>
+                      )}
+                    </View>
+                  </>
+                )}
+
+                {/* Live Bids Checkbox */}
+                <Pressable
+                  onPress={() => setLiveOnly(!liveOnly)}
+                  style={[styles.checkboxRow]}
+                >
+                  <Ionicons
+                    name={liveOnly ? "checkbox-outline" : "square-outline"}
+                    size={22}
+                    color={themeColors.tint}
+                  />
+                  <Text style={{ color: themeColors.text, marginLeft: 8 }}>
+                    Show Live Bids Only
+                  </Text>
+                </Pressable>
+
+                {/* Price Range */}
+                <Text style={[styles.filterLabel, { color: themeColors.icon }]}>
+                  Price Range
+                </Text>
+                <View style={{ flexDirection: "row", gap: 10 }}>
+                  <TextInput
+                    placeholder="Min"
+                    placeholderTextColor={themeColors.icon}
+                    value={minPrice}
+                    onChangeText={setMinPrice}
+                    keyboardType="numeric"
+                    style={[
+                      styles.priceInput,
+                      {
+                        backgroundColor: themeColors.background,
+                        borderColor: themeColors.cardBorder,
+                        color: themeColors.text,
+                      },
+                    ]}
+                  />
+                  <TextInput
+                    placeholder="Max"
+                    placeholderTextColor={themeColors.icon}
+                    value={maxPrice}
+                    onChangeText={setMaxPrice}
+                    keyboardType="numeric"
+                    style={[
+                      styles.priceInput,
+                      {
+                        backgroundColor: themeColors.background,
+                        borderColor: themeColors.cardBorder,
+                        color: themeColors.text,
+                      },
+                    ]}
+                  />
                 </View>
-                
-              )}
-              </View>
-            </>
-          )}
 
-          {/* Live Bids Checkbox */}
-          <Pressable
-            onPress={() => setLiveOnly(!liveOnly)}
-            style={[styles.checkboxRow]}
-          >
-            <Ionicons
-              name={liveOnly ? "checkbox-outline" : "square-outline"}
-              size={22}
-              color={themeColors.tint}
-            />
-            <Text style={{ color: themeColors.text, marginLeft: 8 }}>
-              Show Live Bids Only
-            </Text>
-          </Pressable>
+                {/* Buttons */}
+                <Pressable
+                  onPress={() => setFilterVisible(false)}
+                  style={[
+                    styles.applyBtn,
+                    { backgroundColor: themeColors.tint },
+                  ]}
+                >
+                  <Text style={{ color: "#fff", fontWeight: "600" }}>
+                    Apply Filters
+                  </Text>
+                </Pressable>
 
-          {/* Price Range */}
-          <Text style={[styles.filterLabel, { color: themeColors.icon }]}>
-            Price Range
-          </Text>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <TextInput
-              placeholder="Min"
-              placeholderTextColor={themeColors.icon}
-              value={minPrice}
-              onChangeText={setMinPrice}
-              keyboardType="numeric"
-              style={[
-                styles.priceInput,
-                {
-                  backgroundColor: themeColors.background,
-                  borderColor: themeColors.cardBorder,
-                  color: themeColors.text,
-                },
-              ]}
-            />
-            <TextInput
-              placeholder="Max"
-              placeholderTextColor={themeColors.icon}
-              value={maxPrice}
-              onChangeText={setMaxPrice}
-              keyboardType="numeric"
-              style={[
-                styles.priceInput,
-                {
-                  backgroundColor: themeColors.background,
-                  borderColor: themeColors.cardBorder,
-                  color: themeColors.text,
-                },
-              ]}
-            />
+                <Pressable
+                  onPress={() => {
+                    setSelectedCat1("");
+                    setSelectedCat2("");
+                    setLiveOnly(false);
+                    setMinPrice("");
+                    setMaxPrice("");
+                    setSearchInput("");
+                    setFilterVisible(false);
+                  }}
+                  style={[styles.resetBtn]}
+                >
+                  <Text style={{ color: themeColors.tint, fontWeight: "600" }}>
+                    Reset
+                  </Text>
+                </Pressable>
+              </ScrollView>
+            </View>
           </View>
-
-          {/* Buttons */}
-          <Pressable
-            onPress={() => setFilterVisible(false)}
-            style={[styles.applyBtn, { backgroundColor: themeColors.tint }]}
-          >
-            <Text style={{ color: "#fff", fontWeight: "600" }}>
-              Apply Filters
-            </Text>
-          </Pressable>
-
-          <Pressable
-            onPress={() => {
-              setSelectedCat1("");
-              setSelectedCat2("");
-              setLiveOnly(false);
-              setMinPrice("");
-              setMaxPrice("");
-              setSearchInput("");
-              setFilterVisible(false);
-            }}
-            style={[styles.resetBtn]}
-          >
-            <Text style={{ color: themeColors.tint, fontWeight: "600" }}>
-              Reset
-            </Text>
-            
-          </Pressable>
-        </ScrollView>
-      </View>
+        </View>
+      </Modal>
     </View>
-    </View> 
-  </Modal>
-</View>
   );
 }
 const styles = StyleSheet.create({
@@ -453,8 +506,8 @@ const styles = StyleSheet.create({
   },
   overlayDropdown: {
     position: "absolute",
-    top: '100%', // ✅
-    left: 0,     // ✅ relative to parent
+    top: "100%", // ✅
+    left: 0, // ✅ relative to parent
     right: 0,
     zIndex: 999,
     backgroundColor: "#fff",
@@ -462,7 +515,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     borderWidth: 1,
     overflow: "hidden",
-  },   
+  },
   dropdownItem: {
     paddingVertical: 12,
     paddingHorizontal: 16,
