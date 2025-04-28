@@ -23,7 +23,7 @@ export const sendMessageToChatGPT = async (userMessage: string) => {
     
         if (data.choices && data.choices.length > 0) {
           const reply = data.choices[0].message.content;
-          return reply;  // ✅ RETURN THE REPLY
+          return reply;  
         } else {
           console.error("⚠️ No reply found:", data);
           throw new Error("No reply from Chatbot");

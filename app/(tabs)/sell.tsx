@@ -23,6 +23,7 @@ import { db, auth, storage } from "../../firebaseConfig";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 import { useTheme } from "../../context/ThemeContext";
+import * as ImageManipulator from 'expo-image-manipulator';
 import { Colors } from "../../constants/Colors";
 import { FlatList } from "react-native";
 import { router } from "expo-router";
@@ -85,7 +86,15 @@ export default function SellScreen() {
       setLoading(false);
     }
   };
-
+  const compressImage = async (uri: string) => {
+    const manipulated = await ImageManipulator.manipulateAsync(
+      uri,
+      [],
+      { compress: 0.5, format: ImageManipulator.SaveFormat.JPEG }
+    );
+    return manipulated.uri;
+  };
+  
   const handleImageSelection = async () => {
     if (images.length >= 5) {
       return Alert.alert(
@@ -142,8 +151,10 @@ export default function SellScreen() {
           throw new Error("File does not exist at " + uri);
         }
 
-        const response = await fetch(uri);
+        const compressedUri = await compressImage(uri);
+        const response = await fetch(compressedUri);
         const blob = await response.blob();
+        
 
         const filename = `products/${Date.now()}_${Math.random()
           .toString(36)

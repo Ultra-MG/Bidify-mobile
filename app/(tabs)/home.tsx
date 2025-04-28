@@ -123,7 +123,7 @@ export default function HomeScreen() {
   };
 
   const handleSearch = async (customSearch?: string) => {
-    const term = customSearch ?? search.trim(); // Use customSearch if provided, otherwise normal input
+    const term = customSearch ?? search.trim(); 
     if (term) {
       await saveSearchHistory(term);
       Keyboard.dismiss();
@@ -142,47 +142,7 @@ export default function HomeScreen() {
     return () => clearInterval(interval);
   }, []);
 
-  async function requestNotificationPermissionAndSaveToken() {
-    const { status } = await Notifications.getPermissionsAsync();
 
-    if (status === "granted") {
-      console.log("✅ Notifications already allowed");
-      const token = await registerForPushNotificationsAsync();
-
-      if (token && auth.currentUser) {
-        await setDoc(
-          doc(db, "users", auth.currentUser.uid),
-          { pushToken: token },
-          { merge: true }
-        );
-      }
-      return;
-    }
-
-    alert(
-      "📢 Allow notifications to get the latest deals and bidding updates!"
-    );
-
-    const { status: newStatus } = await Notifications.requestPermissionsAsync();
-
-    if (newStatus === "granted") {
-      console.log("✅ Notifications permission granted after asking.");
-      const token = await registerForPushNotificationsAsync();
-
-      if (token && auth.currentUser) {
-        await setDoc(
-          doc(db, "users", auth.currentUser.uid),
-          { pushToken: token },
-          { merge: true }
-        );
-      }
-    } else {
-      console.log("❌ Notifications permission denied.");
-    }
-  }
-  useEffect(() => {
-    requestNotificationPermissionAndSaveToken();
-  }, []);
   
   const scheduleReminderNotification = async (productName: string) => {
 

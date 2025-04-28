@@ -11,9 +11,7 @@ import {
 } from "react-native";
 import { auth, db } from "../../firebaseConfig";
 import { doc, getDoc, updateDoc, deleteDoc } from "firebase/firestore";
-import { deleteUser, updatePassword } from "firebase/auth";
 import * as ImagePicker from "expo-image-picker";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useTheme } from "../../context/ThemeContext";
@@ -102,11 +100,13 @@ export default function ProfileScreen() {
     }
   };
 
+
+
   const pickImage = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 0.6,
+      quality: 0.5,
     });
 
     if (!result.canceled && result.assets?.length) {

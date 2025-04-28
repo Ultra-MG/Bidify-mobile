@@ -17,7 +17,6 @@ export default function RootLayout() {
 
   Notifications.setNotificationHandler({
     handleNotification: async (notification) => {
-      // Save it here...
       return {
         shouldShowAlert: true,
         shouldPlaySound: true,
@@ -26,10 +25,8 @@ export default function RootLayout() {
     },
   });
   
-  // Inside RootLayout -> useEffect for foreground
   useEffect(() => {
     const subscription = Notifications.addNotificationReceivedListener(async (notification) => {
-      // Save it + Toast here...
     });
   
     return () => subscription.remove();
