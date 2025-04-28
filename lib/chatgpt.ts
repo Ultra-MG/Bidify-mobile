@@ -1,15 +1,11 @@
 
-import axios from "axios";
-
-const API_KEY = "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"; 
-
 export const sendMessageToChatGPT = async (userMessage: string) => {
     try {
         const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
           method: "POST",
           headers: {
             "Content-Type": "application/json", 
-            "Authorization": `Bearer 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`,
+            "Authorization": `Bearer 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`,
           },
           body: JSON.stringify({
             model: "google/gemini-2.0-flash-exp:free",
