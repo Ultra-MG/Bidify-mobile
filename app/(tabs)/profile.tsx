@@ -101,7 +101,7 @@ export default function ProfileScreen() {
             icon: "settings-outline",
             route: "/settings/settings",
           },
-          { label: "Chats", icon: "chatbubble-outline", route: "/chats" },
+          { label: "Chats", icon: "chatbubble-outline", route: "/chat/chatgpt" },
           {
             label: "Logout",
             icon: "log-out-outline",

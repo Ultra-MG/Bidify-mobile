@@ -67,19 +67,19 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
   const handleToggleCart = async () => {
     const user = auth.currentUser;
     if (!user) return;
-
+  
     const cartRef = collection(db, "cart");
     const q = query(
       cartRef,
       where("userId", "==", user.uid),
       where("productId", "==", product.id)
     );
-
+  
     const existing = await getDocs(q);
-
+  
     if (existing.empty) {
       let notificationId = "";
-
+  
       try {
         if (product.startTime) {
           const startDate = fixDate(product.startTime);
@@ -87,7 +87,7 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
           const secondsUntilStart = Math.floor(
             (startDate.getTime() - now.getTime()) / 1000
           );
-
+  
           if (secondsUntilStart > 0) {
             notificationId = await Notifications.scheduleNotificationAsync({
               content: {
@@ -107,27 +107,36 @@ export default function ProductHorizontalCard({ product }: { product: any }) {
       } catch (error) {
         console.error("❌ Failed to schedule notification:", error);
       }
-
+  
+      // 📦 Save to cart only after successful notification scheduling
       await addDoc(cartRef, {
         userId: user.uid,
         productId: product.id,
         notificationId: notificationId,
         timestamp: new Date(),
       });
+  
     } else {
+      // 🛑 If already exists, remove cart and cancel notification
       await Promise.all(
         existing.docs.map(async (docSnap) => {
           const cartData = docSnap.data();
           if (cartData.notificationId) {
-            await Notifications.cancelScheduledNotificationAsync(
-              cartData.notificationId
-            );
+            try {
+              await Notifications.cancelScheduledNotificationAsync(
+                cartData.notificationId
+              );
+              console.log("✅ Cancelled previous notification ID:", cartData.notificationId);
+            } catch (err) {
+              console.error("❌ Failed to cancel notification:", err);
+            }
           }
           await deleteDoc(doc(db, "cart", docSnap.id));
         })
       );
     }
   };
+  
 
   const getTimeDiffString = (futureDate: Date) => {
     const now = new Date();

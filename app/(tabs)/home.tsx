@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "../../context/ThemeContext";
 import { Colors } from "../../constants/Colors";
-import { RefreshControl } from "react-native";
 import { SchedulableTriggerInputTypes } from "expo-notifications";
 import { useRef } from "react";
 import {
@@ -20,7 +19,6 @@ import { useRouter } from "expo-router";
 import { auth } from "../../firebaseConfig";
 import ProductHorizontalCard from "../product/ProductHorizontalCard";
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { registerForPushNotificationsAsync } from "../../lib/notifications";
 import { db } from "../../firebaseConfig";
@@ -52,12 +50,11 @@ export default function HomeScreen() {
   const [searchFocused, setSearchFocused] = useState(false);
   const justTappedHistoryItem = useRef(false);
   const searchInputRef = useRef<TextInput>(null);
+
   const updateLastOpened = async () => {
     await AsyncStorage.setItem("lastOpened", new Date().toISOString());
   };
-  useEffect(() => {
-    loadSearchHistory();
-  }, []);
+
 
   const loadSearchHistory = async () => {
     const history = await AsyncStorage.getItem(SEARCH_HISTORY_KEY);
@@ -65,6 +62,11 @@ export default function HomeScreen() {
       setSearchHistory(JSON.parse(history));
     }
   };
+
+  useEffect(() => {
+    loadSearchHistory();
+  }, []);
+
   const saveSearchHistory = async (term: string) => {
     let updatedHistory = [
       term,
@@ -84,9 +86,11 @@ export default function HomeScreen() {
     await AsyncStorage.removeItem(SEARCH_HISTORY_KEY);
     setSearchHistory([]);
   };
+
   useEffect(() => {
     updateLastOpened();
   }, []);
+
   const fetchRecommended = async (showRefreshing = false) => {
     try {
       if (showRefreshing) setRefreshing(true);
@@ -176,9 +180,11 @@ export default function HomeScreen() {
       console.log("❌ Notifications permission denied.");
     }
   }
-
+  useEffect(() => {
+    requestNotificationPermissionAndSaveToken();
+  }, []);
+  
   const scheduleReminderNotification = async (productName: string) => {
-    await Notifications.cancelAllScheduledNotificationsAsync();
 
     await Notifications.scheduleNotificationAsync({
       content: {

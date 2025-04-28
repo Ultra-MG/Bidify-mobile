@@ -11,12 +11,11 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, db } from "../../firebaseConfig";
 import { router } from "expo-router";
-import { registerForPushNotificationsAsync } from "../../lib/notifications";
 import { useTheme } from "../../context/ThemeContext";
 import { Colors } from "../../constants/Colors";
 import { Image } from "react-native";
 import { ActivityIndicator } from "react-native";
-
+import Toast from 'react-native-toast-message';
 
 export default function Login() {
   const { theme } = useTheme();
@@ -36,7 +35,11 @@ export default function Login() {
       );
       router.replace("/home");
     } catch (error: any) {
-      alert(error.message);
+      Toast.show({
+        type: 'error',
+        text1: 'Error!',
+        text2: 'email and/or password are incorrect or missing',
+      });
     }
  finally {
     setSubmitting(false);

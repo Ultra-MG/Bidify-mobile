@@ -22,7 +22,7 @@ import {
 } from "firebase/firestore";
 import { db, auth } from "../../firebaseConfig";
 
-export default function CartEndedProductCard({ product }: { product: any }) {
+export default function CartEndedProductCard({ product, onRemove }: { product: any, onRemove: () => void }) {
   const router = useRouter();
   const { theme } = useTheme();
   const themeColors = Colors[theme];
@@ -51,16 +51,15 @@ export default function CartEndedProductCard({ product }: { product: any }) {
     try {
       const user = auth.currentUser;
       if (!user) return;
-  
+
       const q = query(
         collection(db, "cart"),
         where("userId", "==", user.uid),
         where("productId", "==", product.id)
       );
-  
+
       const snapshot = await getDocs(q);
-  
-      // Cancel any scheduled notifications first
+
       await Promise.all(
         snapshot.docs.map(async (docSnap) => {
           const cartData = docSnap.data();
@@ -71,15 +70,13 @@ export default function CartEndedProductCard({ product }: { product: any }) {
               console.error("Failed to cancel notification:", err);
             }
           }
+          await deleteDoc(doc(db, "cart", docSnap.id));
         })
       );
-  
-      // Then delete the cart entries
-      await Promise.all(
-        snapshot.docs.map((docSnap) => deleteDoc(doc(db, "cart", docSnap.id)))
-      );
-  
+
       console.log("✅ Product removed from cart");
+      
+      if (onRemove) onRemove();  // 🔥 Call the parent refresh
     } catch (error) {
       console.error("❌ Failed to remove from cart:", error);
     }
